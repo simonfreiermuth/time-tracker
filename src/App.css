@@ -1,0 +1,5 @@
+@import "~@fontsource-variable/open-sans/wght.css";
+
+* {
+  font-family: "Open Sans Variable", sans-serif;
+}
