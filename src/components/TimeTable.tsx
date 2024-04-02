@@ -1,4 +1,4 @@
-import { Box, Grid, fr, Text, Flex, NumberField, Divider, GridItemProps } from "@prismane/core";
+import { Box, Grid, fr, Text, Flex, NumberField, Divider, GridItemProps, Card } from "@prismane/core";
 import { range } from "../utils";
 import { DateTime, Duration } from "luxon";
 import { useEffect, useRef, useState } from "react";
@@ -25,24 +25,22 @@ function Entry({ entry: e }: { entry: TimeTableEntry }) {
     const height = duration.as("hours") * hourH;
 
     return (
-        <Flex t={top} h={height} direction="column" w="100%" pos="absolute" bg="primary">
-            <Text>{e.end.diff(e.start).toFormat("h:mm")}</Text>
+        <Card t={top} h={height} bs="border-box" direction="column" w="100%" pos="absolute" bg="primary">
+            <Text fw="bold" fs="xl" cl="white">{e.end.diff(e.start).toFormat("h:mm")}</Text>
             {e.information &&
-                <Text>{e.information}</Text>
+                <Text cl="white">{e.information}</Text>
             }
-        </Flex>
+        </Card>
     );
 }
 
 export default function TimeTable({ start, days: daysN, entries, style }: TimeTableProps) {
     const ref = useRef<HTMLInputElement>(null);
 
-    // useEffect(() => {
-    //     if (ref.current) {
-    //         console.log("auto scroll...", ref)
-    //         ref.current?.scrollBy(0, 200);
-    //     }
-    // });
+    useEffect(() => {
+        console.log("scroll...", ref.current);
+        ref.current?.scrollIntoView({block: "center"});
+    }, [entries, ref.current]);
 
     const days = range(0, daysN)
         .map(i => start.plus({ days: i }));
@@ -52,7 +50,7 @@ export default function TimeTable({ start, days: daysN, entries, style }: TimeTa
     const currentHour = DateTime.now().hour + (DateTime.now().minute / 60);
 
     return (
-        <Grid ref={ref}
+        <Grid
             templateColumns={5} gap={fr(1)}
             autoRows="auto"
             w="100%"
@@ -63,7 +61,7 @@ export default function TimeTable({ start, days: daysN, entries, style }: TimeTa
         >
             {days.map(day => (
                 <Grid.Item h={10} pos="sticky" rowStart={1} t={0} key={day.day} p={fr(1)}>
-                    {day.toFormat("EEEE")}
+                    <Text fw="bold" fs="xl">{day.toFormat("EEEE")}</Text>
                 </Grid.Item>
             ))}
             {days.map((d, i) => {
