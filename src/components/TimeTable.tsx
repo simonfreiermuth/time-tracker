@@ -6,26 +6,34 @@ import { useEffect, useRef, useState } from "react";
 export interface TimeTableEntry {
     start: DateTime;
     end: DateTime;
-    information?: string
-}
-
-interface TimeTableProps {
-    start: DateTime;
-    days: number;
-    entries: TimeTableEntry[];
-    style?: React.CSSProperties;
+    information?: string;
 }
 
 const hourH = 48;
 const dayH = 24 * hourH;
 
-function Entry({ entry: e }: { entry: TimeTableEntry }) {
+interface EntryProps {
+    entry: TimeTableEntry;
+    onClick?: (entry: TimeTableEntry) => void;
+}
+
+function Entry({ entry: e, onClick }: EntryProps) {
     const top = e.start.hour * hourH;
     const duration = e.end.diff(e.start, "hours");
     const height = duration.as("hours") * hourH;
 
+    const handleClick = onClick ? () => onClick(e) : undefined;
+    
     return (
-        <Card t={top} h={height} bs="border-box" direction="column" w="100%" pos="absolute" bg="primary">
+        <Card 
+            t={top} h={height} w="100%" 
+            bs="border-box" direction="column"
+            pos="absolute" bg="primary"
+            onClick={handleClick}
+            sx={{
+                cursor: onClick ? "pointer" : "auto",
+            }}
+        >
             <Text fw="bold" fs="xl" cl="white">{e.end.diff(e.start).toFormat("h:mm")}</Text>
             {e.information &&
                 <Text cl="white">{e.information}</Text>
@@ -34,7 +42,15 @@ function Entry({ entry: e }: { entry: TimeTableEntry }) {
     );
 }
 
-export default function TimeTable({ start, days: daysN, entries, style }: TimeTableProps) {
+interface TimeTableProps {
+    start: DateTime;
+    days: number;
+    entries: TimeTableEntry[];
+    style?: React.CSSProperties;
+    onClick?: (entry: TimeTableEntry) => void
+}
+
+export default function TimeTable({ start, days: daysN, entries, style, onClick }: TimeTableProps) {
     const ref = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -67,14 +83,18 @@ export default function TimeTable({ start, days: daysN, entries, style }: TimeTa
             {days.map((d, i) => {
                 const colStart = (i >= 0 && i < 13 ? i + 1 : "auto") as GridItemProps["columnStart"];
                 return (
-                    <Grid.Item rowStart={2} rowEnd={2} columnStart={colStart} r={2} h={dayH} p={fr(1)} pos="relative" key={d.day} >
+                    <Grid.Item rowStart={2} rowEnd={2} columnStart={colStart} r={2} h={dayH} p={fr(1)} pos="relative" key={d.day} z={10} >
                         {entriesPerDay[d.day]?.map((e, i) => (
-                            <Entry entry={e} key={i} />
+                            <Entry
+                                entry={e}
+                                onClick={onClick}
+                                key={i}
+                            />
                         ))}
                     </Grid.Item>
                 )
             })}
-            <Grid.Item rowStart={2} rowEnd={2} columnStart={1} columnSpan="full" pos="relative">
+            <Grid.Item rowStart={2} rowEnd={2} columnStart={1} columnSpan="full" pos="relative" z={0} >
                 <Divider bdc="Highlight" t={hourH*currentHour} pos="absolute" ref={ref} />
             </Grid.Item>
         </Grid>

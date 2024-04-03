@@ -1,7 +1,8 @@
-import { Flex, Header, PRISMANE_COLORS, PrismaneProvider, fr, Text } from '@prismane/core'
+import { Flex, Header, PRISMANE_COLORS, PrismaneProvider, fr, Text, Modal } from '@prismane/core'
 import TimeTable, { TimeTableEntry } from './components/TimeTable'
 import "@fontsource/inter";
 import { DateTime } from 'luxon';
+import { useState } from 'react';
 
 function App() {
   const theme = {
@@ -16,6 +17,8 @@ function App() {
     { start: DateTime.local(2024, 4, 2, 8), end: DateTime.local(2024, 4, 2, 11) },
   ];
 
+  const [modalEntry, setModalEntry] = useState<TimeTableEntry|undefined>(undefined);
+
   return (
     <>
       <PrismaneProvider theme={theme}>
@@ -27,8 +30,12 @@ function App() {
             start={DateTime.local(2024, 4, 1)}
             days={5}
             entries={entries}
+            onClick={(e) => setModalEntry(e)}
           />
         </Flex>
+        <Modal open={modalEntry ? true : false} onClose={() => setModalEntry(undefined)} closable>
+          <Text>{JSON.stringify(modalEntry)}</Text>
+        </Modal>
       </PrismaneProvider >
     </>
   )
