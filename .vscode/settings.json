@@ -1,0 +1,4 @@
+{
+    // ensure vs code uses latest typescript compiler for IDE hints",
+    "typescript.tsdk": "./node_modules/typescript/lib"
+}
