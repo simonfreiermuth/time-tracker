@@ -11,11 +11,11 @@ export default function TimeTableScreen() {
         { start: DateTime.local(2024, 4, 2, 8), end: DateTime.local(2024, 4, 2, 11) },
     ];
 
-    const thisWeek = DateTime.now().minus({days: DateTime.now().weekday - 1});
+    const thisWeek = DateTime.now().startOf("week");
     const [date, setDate] = useState(thisWeek);
     const updateDate = (raw: string) => {
         const d = DateTime.fromISO(raw);
-        if (d.isValid) setDate(d);
+        if (d.isValid) setDate(d.startOf("week"));
         else console.error("could not convert date", d);
     }
     const lastWeek = () => setDate(date.plus({ days: 7 }));
@@ -25,7 +25,7 @@ export default function TimeTableScreen() {
         <Stack w="100%" p={fr(4)} bs="border-box">
             <Stack direction="row" w="100%" justify="center" align="center">
                 <ActionButton icon={<CaretLeft size={32} />} onClick={lastWeek} />
-                <NativeDateField name="date" value={date.toISODate()} onChange={(e: any) => updateDate(e.value.target)} />
+                <NativeDateField name="date" value={date.toISODate()} onChange={(e: any) => updateDate(e.target.value)} />
                 <Button onClick={()  => setDate(thisWeek)} size="md">This week</Button>
                 <ActionButton icon={<CaretRight size={32} />} onClick={nextWeek} />
             </Stack>
