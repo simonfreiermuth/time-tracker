@@ -1,7 +1,7 @@
-import { Box, Grid, fr, Text, Flex, NumberField, Divider, GridItemProps, Card } from "@prismane/core";
+import { Grid, fr, Text, Divider, GridItemProps, Card, usePrismaneColor } from "@prismane/core";
 import { range } from "../utils";
-import { DateTime, Duration } from "luxon";
-import { useEffect, useRef, useState } from "react";
+import { DateTime } from "luxon";
+import { useEffect, useRef } from "react";
 
 export interface TimeTableEntry {
     start: DateTime;
@@ -23,10 +23,10 @@ function Entry({ entry: e, onClick }: EntryProps) {
     const height = duration.as("hours") * hourH;
 
     const handleClick = onClick ? () => onClick(e) : undefined;
-    
+
     return (
-        <Card 
-            t={top} h={height} w="100%" 
+        <Card
+            t={top} h={height} w="100%"
             bs="border-box" direction="column"
             pos="absolute" bg="primary"
             onClick={handleClick}
@@ -52,17 +52,18 @@ interface TimeTableProps {
 
 export default function TimeTable({ start, days: daysN, entries, style, onClick }: TimeTableProps) {
     const ref = useRef<HTMLInputElement>(null);
+    const { getColor: getColor } = usePrismaneColor();
 
     useEffect(() => {
         console.log("scroll...", ref.current);
-        ref.current?.scrollIntoView({block: "center"});
+        ref.current?.scrollIntoView({ block: "center" });
     }, [entries, ref.current]);
 
     const days = range(0, daysN)
         .map(i => start.plus({ days: i }));
     const entriesPerDay = Object
         .groupBy(entries, ({ start }) => start.day);
-    
+
     const currentHour = DateTime.now().hour + (DateTime.now().minute / 60);
 
     return (
@@ -72,7 +73,11 @@ export default function TimeTable({ start, days: daysN, entries, style, onClick 
             w="100%"
             h="100%"
             bs="border-box"
-            sx={{ overflowY: "scroll" }}
+            sx={{
+                overflowY: "scroll",
+                scrollbarWidth: "thin",
+                scrollbarColor: `${getColor("base")} transparent`
+            }}
             style={style}
         >
             {days.map(day => (
@@ -95,7 +100,7 @@ export default function TimeTable({ start, days: daysN, entries, style, onClick 
                 )
             })}
             <Grid.Item rowStart={2} rowEnd={2} columnStart={1} columnSpan="full" pos="relative" z={0} >
-                <Divider bdc="Highlight" t={hourH*currentHour} pos="absolute" ref={ref} />
+                <Divider bdc="Highlight" t={hourH * currentHour} pos="absolute" ref={ref} />
             </Grid.Item>
         </Grid>
     )
