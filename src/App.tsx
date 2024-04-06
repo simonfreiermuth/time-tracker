@@ -1,36 +1,35 @@
-import { Flex, Header, PRISMANE_COLORS, PrismaneProvider, fr, Text, Modal, Tabs, Center, useThemeModeValue, Box } from '@prismane/core'
-import TimeTable, { TimeTableEntry } from './components/TimeTable'
+import { Tabs, Box, useThemeModeValue, Flex, Text } from '@prismane/core'
 import "@fontsource/inter";
-import { DateTime } from 'luxon';
-import { useState } from 'react';
 import TimeTableScreen from './screens/TimeTableScreen';
-import { createTheme } from '@prismane/core/themes';
-
-const theme = createTheme({
-  mode: "dark",
-  colors: {
-    primary: { ...PRISMANE_COLORS.pink },
-  },
-  fontFamily: "Inter",
-});
+import HeaderBar from './components/HeaderBar';
+import { Calendar, File, SquaresFour } from '@phosphor-icons/react';
 
 function App() {
+  const background = useThemeModeValue(["base", 50], ["base", 900]);
+  const tabsBackground = useThemeModeValue(["base", 100], ["base", 800]);
 
   return (
     <>
-      <PrismaneProvider theme={theme}>
-        <Box mih="100vh" bg={useThemeModeValue(["base", 50], ["base", 900])}>
-
-          <Tabs defaultValue="timeTable">
-            <Tabs.List fw="bold" fs="l">
-              <Tabs.Tab value="timeTable">Time table</Tabs.Tab>
-              <Tabs.Tab value="projects">Projects</Tabs.Tab>
-              <Tabs.Tab value="report">Report</Tabs.Tab>
-            </Tabs.List>
-            <Tabs.Panel value="timeTable"><TimeTableScreen /></Tabs.Panel>
-          </Tabs>
-        </Box>
-      </PrismaneProvider >
+      <Box mih="100vh" bg={background}>
+        <HeaderBar />
+        <Tabs defaultValue="calendar" variant="filled" direction="row">
+          <Flex direction="column" fs="s" align="stretch" bg={tabsBackground} >
+            <Tabs.Tab value="calendar" direction="column" align="center" justify="center" w="100%" bs="border-box">
+              <Calendar size={32} />
+              Calendar
+            </Tabs.Tab>
+            <Tabs.Tab value="projects" direction="column" align="center" justify="center" w="100%" bs="border-box">
+              <SquaresFour size={32} />
+              Projects
+            </Tabs.Tab>
+            <Tabs.Tab value="report" direction="column" align="center" justify="center" w="100%" bs="border-box">
+              <File size={32} />
+              Report
+            </Tabs.Tab>
+          </Flex>
+          <Tabs.Panel value="calendar"><TimeTableScreen /></Tabs.Panel>
+        </Tabs>
+      </Box>
     </>
   )
 }
