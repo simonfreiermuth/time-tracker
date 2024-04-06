@@ -1,8 +1,9 @@
 import TimeTable, { TimeTableEntry } from "../components/TimeTable";
 import { DateTime } from "luxon";
-import { ActionButton, Button, Flex, NativeDateField, Stack, fr } from "@prismane/core";
+import { ActionButton, Button, Flex, Modal, NativeDateField, Stack, fr } from "@prismane/core";
 import { useState } from "react";
 import { CaretLeft, CaretRight } from "@phosphor-icons/react";
+import EntryForm from "../components/EntryForm";
 
 export default function TimeTableScreen() {
     const entries: TimeTableEntry[] = [
@@ -38,6 +39,9 @@ export default function TimeTableScreen() {
                     onClickTable={(d) => console.log("click on table...", d.toISO())}
                 />
             </Flex>
+            <Modal open={true}>
+                <EntryForm entry={entries[0]} />
+            </Modal>
         </Stack>
     )
 }
