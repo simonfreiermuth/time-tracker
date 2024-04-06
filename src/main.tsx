@@ -7,7 +7,7 @@ import { createTheme } from '@prismane/core/themes';
 const theme = createTheme({
   mode: "dark",
   colors: {
-    primary: { ...PRISMANE_COLORS.pink },
+    primary: { ...PRISMANE_COLORS.teal },
   },
   fontFamily: "Inter",
 });
