@@ -34,6 +34,8 @@ export default function TimeTableScreen() {
                     start={date}
                     days={5}
                     entries={entries}
+                    onClickEntry={() => console.log("click on entry...")}
+                    onClickTable={(d) => console.log("click on table...", d.toISO())}
                 />
             </Flex>
         </Stack>
