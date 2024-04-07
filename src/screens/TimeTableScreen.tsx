@@ -7,9 +7,9 @@ import EntryForm from "../components/EntryForm";
 
 export default function TimeTableScreen() {
     const entries: TimeTableEntry[] = [
-        { start: DateTime.local(2024, 4, 1, 8), end: DateTime.local(2024, 4, 1, 12), information: "TSapp" },
-        { start: DateTime.local(2024, 4, 1, 13), end: DateTime.local(2024, 4, 1, 18) },
-        { start: DateTime.local(2024, 4, 2, 8), end: DateTime.local(2024, 4, 2, 11) },
+        { id: "1", start: DateTime.local(2024, 4, 1, 8), end: DateTime.local(2024, 4, 1, 12), project: "TSapp" },
+        { id: "2", start: DateTime.local(2024, 4, 1, 13), end: DateTime.local(2024, 4, 1, 18) },
+        { id: "3", start: DateTime.local(2024, 4, 2, 8), end: DateTime.local(2024, 4, 2, 11) },
     ];
 
     const thisWeek = DateTime.now().startOf("week");
@@ -27,7 +27,7 @@ export default function TimeTableScreen() {
             <Stack direction="row" w="100%" justify="center" align="center">
                 <ActionButton icon={<CaretLeft size={32} />} onClick={lastWeek} />
                 <NativeDateField name="date" value={date.toISODate()} onChange={(e: any) => updateDate(e.target.value)} />
-                <Button onClick={()  => setDate(thisWeek)} size="md">This week</Button>
+                <Button onClick={() => setDate(thisWeek)} size="md">This week</Button>
                 <ActionButton icon={<CaretRight size={32} />} onClick={nextWeek} />
             </Stack>
             <Flex w="100%" h="80vh">
@@ -39,7 +39,7 @@ export default function TimeTableScreen() {
                     onClickTable={(d) => console.log("click on table...", d.toISO())}
                 />
             </Flex>
-            <Modal open={true}>
+            <Modal open={true} of="visible" >
                 <EntryForm entry={entries[0]} />
             </Modal>
         </Stack>

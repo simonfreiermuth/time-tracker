@@ -4,9 +4,10 @@ import { DateTime } from "luxon";
 import { useEffect, useRef, useState } from "react";
 
 export interface TimeTableEntry {
+    id: string;
     start: DateTime;
     end: DateTime;
-    information?: string;
+    project?: string;
 }
 
 const hourH = 48;
@@ -35,8 +36,8 @@ function Entry({ entry: e, onClick }: EntryProps) {
             }}
         >
             <Text fw="bold" fs="xl" cl="white">{e.end.diff(e.start).toFormat("h:mm")}</Text>
-            {e.information &&
-                <Text cl="white">{e.information}</Text>
+            {e.project &&
+                <Text cl="white">{e.project}</Text>
             }
         </Card>
     );
