@@ -40,7 +40,12 @@ export default function TimeTableScreen() {
                 />
             </Flex>
             <Modal open={true} of="visible" >
-                <EntryForm entry={entries[0]} />
+                <EntryForm
+                    entry={entries[0]}
+                    onSubmit={e => console.log(e)}
+                    onCancel={() => { }}
+                    title={"Edit entry"}
+                />
             </Modal>
         </Stack>
     )
