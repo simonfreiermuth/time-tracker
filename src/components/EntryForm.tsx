@@ -1,7 +1,7 @@
 import { AutocompleteField, Button, Field, Flex, NativeDateField, NumberField, Stack, Text, fr } from "@prismane/core";
-import { TimeTableEntry } from "./TimeTable";
 import { useState } from "react";
 import { DateTime } from "luxon";
+import { TimeTableEntry, createEntry } from "../data/entry";
 
 interface EntryFormProps {
     entry?: TimeTableEntry;
@@ -60,17 +60,12 @@ export default function EntryForm({ entry, date: initDate, title, onSubmit, onCa
 
     const submit = () => {
         if (!start || !end) return;
-        const e = entry ? { // TODO provide a global entry factory function
+        const e = entry ? {
             ...entry,
             start: start,
             end: end,
             project: project
-        } : {
-            id: crypto.randomUUID(),
-            start: start,
-            end: end,
-            project: project,
-        };
+        } : createEntry(start, end, project);
         onSubmit(e);
     };
 

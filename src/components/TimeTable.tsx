@@ -2,16 +2,10 @@ import { Grid, fr, Text, Divider, GridItemProps, Card, usePrismaneColor, Box } f
 import { range } from "../utils";
 import { DateTime } from "luxon";
 import { useEffect, useRef, useState } from "react";
+import { TimeTableEntry, getDuration } from "../data/entry";
 
-export interface TimeTableEntry {
-    id: string;
-    start: DateTime;
-    end: DateTime;
-    project?: string;
-}
-
-const hourH = 48;
-const dayH = 24 * hourH;
+const HOUR_H = 48;
+const DAY_H = 24 * HOUR_H;
 
 interface EntryProps {
     entry: TimeTableEntry;
@@ -19,9 +13,9 @@ interface EntryProps {
 }
 
 function Entry({ entry: e, onClick }: EntryProps) {
-    const top = e.start.hour * hourH;
-    const duration = e.end.diff(e.start, "hours");
-    const height = duration.as("hours") * hourH;
+    const top = e.start.hour * HOUR_H;
+    const duration = getDuration(e);
+    const height = duration.as("hours") * HOUR_H;
 
     const handleClick = onClick ? () => onClick(e) : undefined;
 
@@ -35,7 +29,7 @@ function Entry({ entry: e, onClick }: EntryProps) {
                 cursor: onClick ? "pointer" : "auto",
             }}
         >
-            <Text fw="bold" fs="xl" cl="white">{e.end.diff(e.start).toFormat("h:mm")}</Text>
+            <Text fw="bold" fs="xl" cl="white">{duration.toFormat("h:mm")}</Text>
             {e.project &&
                 <Text cl="white">{e.project}</Text>
             }
@@ -72,7 +66,7 @@ export default function TimeTable({ start, days: daysN, entries, style, onClickE
         if (!tableClickable || !onClickTable) return; // do not fire the event when clicking on an existing entry
         const offsetY: number = event.target.getBoundingClientRect().top;
         const y = event.clientY - offsetY;
-        const h = y / hourH;
+        const h = y / HOUR_H;
         const d = day.set({ hour: h });
         onClickTable(d);
     }
@@ -102,7 +96,7 @@ export default function TimeTable({ start, days: daysN, entries, style, onClickE
                     <Grid.Item
                         onClick={(e: any) => handleClick(d, e)}
                         rowStart={2} rowEnd={2} columnStart={colStart} r={2}
-                        h={dayH} p={fr(1)} pos="relative" key={d.day} z={10}
+                        h={DAY_H} p={fr(1)} pos="relative" key={d.day} z={10}
                         sx={{
                             cursor: onClickTable ? "pointer" : "auto",
                         }}>
@@ -122,7 +116,7 @@ export default function TimeTable({ start, days: daysN, entries, style, onClickE
                 )
             })}
             <Grid.Item rowStart={2} rowEnd={2} columnStart={1} columnSpan="full" pos="relative" z={0} >
-                <Divider bdc="Highlight" t={hourH * currentHour} pos="absolute" ref={ref} />
+                <Divider bdc="Highlight" t={HOUR_H * currentHour} pos="absolute" ref={ref} />
             </Grid.Item>
         </Grid>
     )

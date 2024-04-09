@@ -1,9 +1,10 @@
-import TimeTable, { TimeTableEntry } from "../components/TimeTable";
+import TimeTable from "../components/TimeTable";
 import { DateTime } from "luxon";
 import { ActionButton, Button, Flex, Modal, NativeDateField, Stack, fr } from "@prismane/core";
 import { useState } from "react";
 import { CaretLeft, CaretRight } from "@phosphor-icons/react";
 import EntryForm from "../components/EntryForm";
+import { TimeTableEntry } from "../data/entry";
 
 export default function TimeTableScreen() {
     const entries: TimeTableEntry[] = [
