@@ -4,14 +4,12 @@ import { ActionButton, Button, Flex, Modal, NativeDateField, Stack, fr } from "@
 import { useState } from "react";
 import { CaretLeft, CaretRight } from "@phosphor-icons/react";
 import EntryForm from "../components/EntryForm";
+import { useAppStore } from "../data/store";
 import { TimeTableEntry } from "../data/entry";
 
 export default function TimeTableScreen() {
-    const entries: TimeTableEntry[] = [
-        { id: "1", start: DateTime.local(2024, 4, 1, 8), end: DateTime.local(2024, 4, 1, 12), project: "TSapp" },
-        { id: "2", start: DateTime.local(2024, 4, 1, 13), end: DateTime.local(2024, 4, 1, 18) },
-        { id: "3", start: DateTime.local(2024, 4, 2, 8), end: DateTime.local(2024, 4, 2, 11) },
-    ];
+    const entries = useAppStore(state => state.entries);
+    const addEntry = useAppStore(state => state.addEntry);
 
     const thisWeek = DateTime.now().startOf("week");
     const [date, setDate] = useState(thisWeek);
@@ -22,6 +20,18 @@ export default function TimeTableScreen() {
     }
     const lastWeek = () => setDate(date.plus({ days: 7 }));
     const nextWeek = () => setDate(date.minus({ days: 7 }));
+
+    const [createEntryOpen, setCreateEntryOpen] = useState(false);
+    const [createEntryDate, setCreateEntryDate] = useState<DateTime | undefined>(undefined);
+    const createEntry = (date?: DateTime) => {
+        setCreateEntryDate(date ?? DateTime.now());
+        setCreateEntryOpen(true);
+    };
+    const submitEntry = (entry: TimeTableEntry) => {
+        addEntry(entry);
+        setCreateEntryDate(undefined);
+        setCreateEntryOpen(false);
+    };
 
     return (
         <Stack w="100%" p={fr(4)} bs="border-box">
@@ -37,14 +47,14 @@ export default function TimeTableScreen() {
                     days={5}
                     entries={entries}
                     onClickEntry={() => console.log("click on entry...")}
-                    onClickTable={(d) => console.log("click on table...", d.toISO())}
+                    onClickTable={createEntry}
                 />
             </Flex>
-            <Modal open={true} of="visible" >
+            <Modal open={createEntryOpen} of="visible" >
                 <EntryForm
-                    entry={entries[0]}
-                    onSubmit={e => console.log(e)}
-                    onCancel={() => { }}
+                    date={createEntryDate}
+                    onSubmit={e => submitEntry(e)}
+                    onCancel={() => setCreateEntryOpen(false)}
                     title={"Edit entry"}
                 />
             </Modal>
