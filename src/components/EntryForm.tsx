@@ -6,18 +6,19 @@ import { TimeTableEntry, createEntry } from "../data/entry";
 interface EntryFormProps {
     entry?: TimeTableEntry;
     date?: DateTime;
+    start?: DateTime;
     title: string;
     onSubmit: (entry: TimeTableEntry) => void;
     onCancel: () => void;
 }
 
-export default function EntryForm({ entry, date: initDate, title, onSubmit, onCancel }: EntryFormProps) {
+export default function EntryForm({ entry, date: initDate, start: initStart, title, onSubmit, onCancel }: EntryFormProps) {
     /* implementation note:
     The useForm hook is not used to prevent type information loss and 
     calculations (duration) are done ad hoc so handling data as strings is 
     not very suitable here.*/
     const [date, setDate] = useState(initDate ?? entry?.start ?? DateTime.now());
-    const [start, setStart] = useState(entry?.start);
+    const [start, setStart] = useState(initStart ?? entry?.start);
     const [end, setEnd] = useState(entry?.end);
     const [project, setProject] = useState(entry?.project ?? "");
 
@@ -72,7 +73,7 @@ export default function EntryForm({ entry, date: initDate, title, onSubmit, onCa
     const canSubmit = start && end;
 
     return (
-        <Stack direction="column" gap={fr(2)}>
+        <Stack direction="column" gap={fr(2)} of="visible">
             <Text as="h2">{title}</Text>
             <NativeDateField value={date.toISODate() ?? ""} onChange={updateDate} name="date" label="Date" />
             <Stack direction="row">
