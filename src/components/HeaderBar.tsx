@@ -1,9 +1,16 @@
 import { Moon, Sun, Timer } from "@phosphor-icons/react";
 import { ActionButton, Header, Text, fr, usePrismaneColor, usePrismaneTheme, useThemeModeValue } from "@prismane/core";
+import { useAppStore } from "../data/store";
 
 export default function HeaderBar() {
+    const toggleThemeModeStore = useAppStore(s => s.toggleThemeMode);
     const { toggleThemeMode, theme } = usePrismaneTheme();
     const { getColor  } = usePrismaneColor();
+
+    const toggle = () => {
+        toggleThemeMode();
+        toggleThemeModeStore();
+    }
 
     return (
         <Header
@@ -13,7 +20,7 @@ export default function HeaderBar() {
         >
             <Text as="h1" >Time tracker <Timer size={32} weight="fill" color={getColor("primary")} /> </Text>
             <ActionButton
-                onClick={toggleThemeMode}
+                onClick={toggle}
                 size="md"
                 icon={theme.mode === "light" ? <Moon /> : <Sun />}
             />
