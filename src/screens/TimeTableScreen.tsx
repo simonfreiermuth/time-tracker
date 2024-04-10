@@ -18,8 +18,8 @@ export default function TimeTableScreen() {
         if (d.isValid) setDate(d.startOf("week"));
         else console.error("could not convert date", d);
     }
-    const lastWeek = () => setDate(date.plus({ days: 7 }));
-    const nextWeek = () => setDate(date.minus({ days: 7 }));
+    const lastWeek = () => setDate(date.minus({ days: 7 }));
+    const nextWeek = () => setDate(date.plus({ days: 7 }));
 
     const [createEntryOpen, setCreateEntryOpen] = useState(false);
     const [createEntryDate, setCreateEntryDate] = useState<DateTime | undefined>(undefined);
@@ -53,9 +53,10 @@ export default function TimeTableScreen() {
             <Modal open={createEntryOpen} of="visible" >
                 <EntryForm
                     date={createEntryDate}
+                    start={createEntryDate}
                     onSubmit={e => submitEntry(e)}
                     onCancel={() => setCreateEntryOpen(false)}
-                    title={"Edit entry"}
+                    title={"Create new entry"}
                 />
             </Modal>
         </Stack>
