@@ -57,7 +57,11 @@ export default function TimeTable({ start, days: daysN, entries, style, onClickE
     const days = range(0, daysN)
         .map(i => start.plus({ days: i }));
     const entriesPerDay = Object
-        .groupBy(entries, ({ start }) => start.day);
+        .groupBy(
+            // only show this weeks entries
+            // TODO this implementation asumes weeks. Maybe checking weither the table range (start + daysN) overlaps the entry range (start..end)
+            entries.filter(({start: e}) => e.weekNumber === start.weekNumber && e.weekYear === start.weekYear),
+            ({ start }) => start.day);
 
     const currentHour = DateTime.now().hour + (DateTime.now().minute / 60);
 
