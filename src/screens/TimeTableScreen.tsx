@@ -10,6 +10,8 @@ import { TimeTableEntry } from "../data/entry";
 export default function TimeTableScreen() {
     const entries = useAppStore(state => state.entries);
     const addEntry = useAppStore(state => state.addEntry);
+    const updateEntry = useAppStore(state => state.updateEntry);
+    const deleteEntry = useAppStore(state => state.deleteEntry);
 
     const thisWeek = DateTime.now().startOf("week");
     const [date, setDate] = useState(thisWeek);
@@ -23,14 +25,31 @@ export default function TimeTableScreen() {
 
     const [createEntryOpen, setCreateEntryOpen] = useState(false);
     const [createEntryDate, setCreateEntryDate] = useState<DateTime | undefined>(undefined);
-    const createEntry = (date?: DateTime) => {
+    const onCreateEntry = (date?: DateTime) => {
         setCreateEntryDate(date ?? DateTime.now());
         setCreateEntryOpen(true);
     };
-    const submitEntry = (entry: TimeTableEntry) => {
+    const submitCreateEntry = (entry: TimeTableEntry) => {
         addEntry(entry);
         setCreateEntryDate(undefined);
         setCreateEntryOpen(false);
+    };
+
+    const [editEntry, setEditEntry] = useState<TimeTableEntry | undefined>(undefined);
+    const [editEntryOpen, setEditEntryOpen] = useState(false);
+    const onEditEntry = (entry: TimeTableEntry) => {
+        setEditEntry(entry);
+        setEditEntryOpen(true);
+    };
+    const submitEditEntry = (entry: TimeTableEntry) => {
+        updateEntry(entry);
+        setEditEntry(undefined);
+        setEditEntryOpen(false);
+    };
+    const submitDeleteEntry = (entry: TimeTableEntry) => {
+        setEditEntryOpen(false);
+        setEditEntry(undefined);
+        deleteEntry(entry);
     };
 
     return (
@@ -46,17 +65,26 @@ export default function TimeTableScreen() {
                     start={date}
                     days={5}
                     entries={entries}
-                    onClickEntry={() => console.log("click on entry...")}
-                    onClickTable={createEntry}
+                    onClickEntry={onEditEntry}
+                    onClickTable={onCreateEntry}
                 />
             </Flex>
-            <Modal open={createEntryOpen} of="visible" >
+            <Modal open={createEntryOpen} of="visible" onClose={() => setCreateEntryOpen(false)} closable >
                 <EntryForm
                     date={createEntryDate}
                     start={createEntryDate}
-                    onSubmit={e => submitEntry(e)}
+                    onSubmit={e => submitCreateEntry(e)}
                     onCancel={() => setCreateEntryOpen(false)}
                     title={"Create new entry"}
+                />
+            </Modal>
+            <Modal open={editEntryOpen} of="visible" onClose={() => setEditEntryOpen(false)} closable >
+                <EntryForm
+                    entry={editEntry}
+                    onSubmit={submitEditEntry}
+                    onCancel={() => setEditEntryOpen(false)}
+                    onDelete={submitDeleteEntry}
+                    title={"Edit entry"}
                 />
             </Modal>
         </Stack>
