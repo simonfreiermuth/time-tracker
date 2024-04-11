@@ -4,14 +4,14 @@ import { ActionButton, Button, Flex, Modal, NativeDateField, Stack, fr } from "@
 import { useState } from "react";
 import { CaretLeft, CaretRight } from "@phosphor-icons/react";
 import EntryForm from "../components/EntryForm";
-import { useAppStore } from "../data/store";
 import { TimeTableEntry } from "../data/entry";
+import { useStoreContext } from "../data/StoreProvider";
 
 export default function TimeTableScreen() {
-    const entries = useAppStore(state => state.entries);
-    const addEntry = useAppStore(state => state.addEntry);
-    const updateEntry = useAppStore(state => state.updateEntry);
-    const deleteEntry = useAppStore(state => state.deleteEntry);
+    const entries = useStoreContext(state => state.entries);
+    const addEntry = useStoreContext(state => state.addEntry);
+    const updateEntry = useStoreContext(state => state.updateEntry);
+    const deleteEntry = useStoreContext(state => state.deleteEntry);
 
     const thisWeek = DateTime.now().startOf("week");
     const [date, setDate] = useState(thisWeek);

@@ -1,9 +1,10 @@
-import { create } from "zustand";
+import { createStore } from "zustand";
 import { TimeTableEntry } from "./entry";
 import { DateTime } from "luxon";
 import { createJSONStorage, persist } from "zustand/middleware";
+import { dualStorage } from "./dualStorage";
 
-interface AppStore {
+export interface AppState {
     themeMode: "light" | "dark";
     entries: TimeTableEntry[];
 
@@ -13,24 +14,29 @@ interface AppStore {
     deleteEntry: (entry: TimeTableEntry) => void;
 }
 
-export const useAppStore = create<AppStore>()(
-    persist((set, get) => ({
-        themeMode: "dark",
-        entries: [],
-        
-        toggleThemeMode: () => set({ themeMode: get().themeMode === "dark" ? "light" : "dark" }),
-        addEntry: (entry) => set({ entries: [...get().entries, entry] }),
-        updateEntry: (entry) => set({ entries: [...get().entries.filter(e => e.id !== entry.id), entry] }),
-        deleteEntry: (entry) => set({ entries: [...get().entries.filter(e => e.id !== entry.id)] })
-    }), {
-        name: "app-storage",
-        storage: createJSONStorage(() => localStorage, {
-            reviver: (_, value: any) => {
-                if (value) { // parse any valid date to a DateTime object
-                    const d = DateTime.fromISO(value);
-                    if (d.isValid) return d;
+export type AppStore = ReturnType<typeof createAppStore>;
+
+export const createAppStore = (fileHandle?: FileSystemFileHandle) => {
+    return createStore<AppState>()(
+        persist((set, get) => ({
+            themeMode: "dark",
+            entries: [],
+
+            toggleThemeMode: () => set({ themeMode: get().themeMode === "dark" ? "light" : "dark" }),
+            addEntry: (entry) => set({ entries: [...get().entries, entry] }),
+            updateEntry: (entry) => set({ entries: [...get().entries.filter(e => e.id !== entry.id), entry] }),
+            deleteEntry: (entry) => set({ entries: [...get().entries.filter(e => e.id !== entry.id)] }),
+        }), {
+            name: "app-storage",
+            storage: createJSONStorage(() => dualStorage(fileHandle), {
+                reviver: (_, value: any) => {
+                    if (value) { // parse any valid date to a DateTime object
+                        const d = DateTime.fromISO(value);
+                        if (d.isValid) return d;
+                    }
+                    return value;
                 }
-                return value;
-            }
+            })
         })
-    }));
+    );
+};
