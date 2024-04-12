@@ -3,10 +3,11 @@ import ReactDOM from 'react-dom/client'
 import App from './App.tsx'
 import { PRISMANE_COLORS, PrismaneProvider } from '@prismane/core'
 import { createTheme } from '@prismane/core/themes';
-import StoreProvider, { useStoreContext } from './data/StoreProvider.tsx';
+import DataStoreProvider from './data/StoreProvider.tsx';
+import { useAppStore } from './data/stores.ts';
 
 function ThemeWrapper({ children }: { children: ReactNode | ReactNode[] }) {
-  const mode = useStoreContext(s => s.themeMode);
+  const mode = useAppStore(s => s.themeMode);
   let theme = createTheme({
     mode: mode,
     colors: {
@@ -24,10 +25,10 @@ function ThemeWrapper({ children }: { children: ReactNode | ReactNode[] }) {
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <StoreProvider>
-      <ThemeWrapper>
+    <ThemeWrapper>
+      <DataStoreProvider>
         <App />
-      </ThemeWrapper>
-    </StoreProvider>
+      </DataStoreProvider>
+    </ThemeWrapper>
   </React.StrictMode>,
 )
