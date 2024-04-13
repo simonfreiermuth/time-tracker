@@ -1,7 +1,7 @@
 import React, { ReactNode } from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.tsx'
-import { PRISMANE_COLORS, PrismaneProvider } from '@prismane/core'
+import { PRISMANE_COLORS, PrismaneProvider, Toaster } from '@prismane/core'
 import { createTheme } from '@prismane/core/themes';
 import DataStoreProvider from './data/StoreProvider.tsx';
 import { useAppStore } from './data/stores.ts';
@@ -18,7 +18,9 @@ function ThemeWrapper({ children }: { children: ReactNode | ReactNode[] }) {
 
   return (
     <PrismaneProvider theme={theme}>
-      {children}
+      <Toaster>
+        {children}
+      </Toaster>
     </PrismaneProvider>
   )
 }
