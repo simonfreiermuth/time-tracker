@@ -60,7 +60,7 @@ export default function TimeTableScreen() {
                 <Button onClick={() => setDate(thisWeek)} size="md">This week</Button>
                 <ActionButton icon={<CaretRight size={32} />} onClick={nextWeek} />
             </Stack>
-            <Flex w="100%" h="80vh">
+            <Flex w="100%" of="hidden">
                 <TimeTable
                     start={date}
                     days={5}

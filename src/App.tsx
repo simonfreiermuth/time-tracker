@@ -9,7 +9,7 @@ function App() {
   const tabsBackground = useThemeModeValue(["base", 100], ["base", 800]);
 
   return (
-    <Box mih="100vh" bg={background}>
+    <Box h="100vh" bg={background} of="hidden">
       <HeaderBar />
       <Tabs defaultValue="calendar" variant="filled" direction="row">
         <Flex direction="column" fs="s" align="stretch" bg={tabsBackground} >
