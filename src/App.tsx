@@ -10,7 +10,7 @@ function App() {
 
   return (
     <Box h="100vh" bg={background} of="hidden">
-      <HeaderBar />
+      <HeaderBar dataSwitch />
       <Tabs defaultValue="calendar" variant="filled" direction="row">
         <Flex direction="column" fs="s" align="stretch" bg={tabsBackground} >
           <Tabs.Tab value="calendar" direction="column" align="center" justify="center" w="100%" bs="border-box">

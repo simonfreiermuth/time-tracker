@@ -25,12 +25,15 @@ export default function DataStoreProvider(props: React.PropsWithChildren) {
     const storeRef = useRef<DataStore>();
 
     const reopen = async () => {
-        if (dataSource === "file") {
+        if (dataSource == undefined) return;
+        else if (dataSource === "file") {
             // use indexDB directly to avoid serialization by localStorage or Zustand (when wrapping indexDB)
             const fh = await get<FileSystemFileHandle>("filehandle");
             if (fh) {
                 storeRef.current = createDataStore(fh);
                 setStorageReady(true);
+            } else {
+                await openFile();
             }
         } else {
             // localStorage
@@ -43,7 +46,7 @@ export default function DataStoreProvider(props: React.PropsWithChildren) {
         reopen()
             .then(() => toast({ element: <Alert variant="success">Reloaded data</Alert> }))
             .catch(() => toast({ element: <Alert variant="error">Could not automatically reload data</Alert> }))
-    }, []);
+    }, [dataSource]); // reinitialize store on dataSource change
 
     const openFile = async () => {
         if (!window.isSecureContext) toast({ element: <Alert variant="error" >Can not access files in unsecure context</Alert> });
