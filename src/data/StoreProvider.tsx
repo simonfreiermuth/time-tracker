@@ -1,9 +1,10 @@
-import { createContext, useContext, useRef, useState } from "react";
-import { DataStoreState, DataStore, createDataStore } from "./stores";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
+import { DataStoreState, DataStore, createDataStore, useAppStore } from "./stores";
 import { useStore } from "zustand";
-import { ActionButton, Alert, Box, Button, Card, Center, Divider, Flex, fr, useThemeModeValue, useToast } from "@prismane/core";
+import { ActionButton, Alert, Box, Card, Center, Divider, fr, useThemeModeValue, useToast } from "@prismane/core";
 import HeaderBar from "../components/HeaderBar";
 import { File, FileDashed, FileText } from "@phosphor-icons/react";
+import { get, set } from "idb-keyval";
 
 const StoreContext = createContext<DataStore | undefined>(undefined);
 
@@ -16,15 +17,40 @@ export function useDataStore<T>(selector: (state: DataStoreState) => T): T {
 export default function DataStoreProvider(props: React.PropsWithChildren) {
     const background = useThemeModeValue(["base", 50], ["base", 900]);
     const toast = useToast();
-    const [storageReady, setStorageReady] = useState(false);
 
+    const dataSource = useAppStore().dataSource;
+    const setDataSource = useAppStore().setDataSource;
+
+    const [storageReady, setStorageReady] = useState(false);
     const storeRef = useRef<DataStore>();
 
+    const reopen = async () => {
+        if (dataSource === "file") {
+            // use indexDB directly to avoid serialization by localStorage or Zustand (when wrapping indexDB)
+            const fh = await get<FileSystemFileHandle>("filehandle");
+            if (fh) {
+                storeRef.current = createDataStore(fh);
+                setStorageReady(true);
+            }
+        } else {
+            // localStorage
+            storeRef.current = createDataStore();
+            setStorageReady(true);
+        }
+    };
+
+    useEffect(() => {
+        reopen()
+            .then(() => toast({ element: <Alert variant="success">Reloaded data</Alert> }))
+            .catch(() => toast({ element: <Alert variant="error">Could not automatically reload data</Alert> }))
+    }, []);
 
     const openFile = async () => {
         if (!window.isSecureContext) toast({ element: <Alert variant="error" >Can not access files in unsecure context</Alert> });
         try {
             const [fh] = await window.showOpenFilePicker();
+            await set("filehandle", fh);
+            setDataSource("file");
             storeRef.current = createDataStore(fh);
             setStorageReady(true);
         } catch (e) {
@@ -41,6 +67,8 @@ export default function DataStoreProvider(props: React.PropsWithChildren) {
                 `data-${crypto.randomUUID()}.json`,
                 { create: true }
             );
+            await set("filehandle", fh);
+            setDataSource("file");
             storeRef.current = createDataStore(fh);
             setStorageReady(true);
         } catch (e) {
@@ -49,7 +77,9 @@ export default function DataStoreProvider(props: React.PropsWithChildren) {
         }
     };
 
-    const useLocalStorage = () => {
+    const useLocalStorage = async () => {
+        await set("filehandle", undefined);
+        setDataSource("localStorage");
         storeRef.current = createDataStore();
         setStorageReady(true);
     };

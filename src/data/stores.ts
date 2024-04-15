@@ -39,14 +39,19 @@ export const createDataStore = (fileHandle?: FileSystemFileHandle) => {
 
 export interface AppStore {
     themeMode: "light" | "dark";
+    dataSource?: "localStorage" | "file";
 
     toggleThemeMode: () => void;
+    setDataSource: (source: "localStorage" | "file") => void;
 }
 
 export const useAppStore = create<AppStore>()(
     persist((set, get) => ({
         themeMode: "dark",
+        dataSource: undefined,
+
         toggleThemeMode: () => set({ themeMode: get().themeMode === "dark" ? "light" : "dark" }),
+        setDataSource: (src) => set({ dataSource: src }),
     }), {
         name: "app-storage",
         storage: createJSONStorage(() => localStorage)
