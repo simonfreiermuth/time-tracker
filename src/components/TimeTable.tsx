@@ -1,4 +1,4 @@
-import { Grid, fr, Text, Divider, GridItemProps, Card, usePrismaneColor, Box } from "@prismane/core";
+import { Grid, fr, Text, Divider, GridItemProps, Card, usePrismaneColor, Box, useThemeModeValue } from "@prismane/core";
 import { range } from "../utils";
 import { DateTime } from "luxon";
 import { useEffect, useRef, useState } from "react";
@@ -50,6 +50,7 @@ interface TimeTableProps {
 export default function TimeTable({ start, days: daysN, entries, style, onClickEntry, onClickTable }: TimeTableProps) {
     const ref = useRef<HTMLInputElement>(null);
     const { getColor: getColor } = usePrismaneColor();
+    const background = useThemeModeValue(["base", 50, 0.5], ["base", 900, 0.5]);
 
     useEffect(() => {
         const grid = document.getElementById("timetable");
@@ -66,7 +67,7 @@ export default function TimeTable({ start, days: daysN, entries, style, onClickE
     const entriesPerDay = Object
         .groupBy(
             // only show this weeks entries
-            // TODO this implementation asumes weeks. Maybe checking weither the table range (start + daysN) overlaps the entry range (start..end)
+            // TODO this implementation assumes weeks. Maybe checking weither the table range (start + daysN) overlaps the entry range (start..end)
             entries.filter(({start: e}) => e.weekNumber === start.weekNumber && e.weekYear === start.weekYear),
             ({ start }) => start.day);
 
@@ -98,7 +99,7 @@ export default function TimeTable({ start, days: daysN, entries, style, onClickE
             id="timetable"
         >
             {days.map(day => (
-                <Grid.Item h={10} pos="sticky" rowStart={1} t={0} key={day.day} p={fr(1)}>
+                <Grid.Item pos="sticky" rowStart={1} t={0} key={day.day} p={fr(1)} z={100} bg={background} sx={{ backdropFilter: "blur(4px)", marginLeft: "-2px", marginRight: "-2px"}} >
                     <Text fw="bold" fs="xl">{day.toFormat("EEEE")}</Text>
                 </Grid.Item>
             ))}
