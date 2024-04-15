@@ -3,6 +3,7 @@ import { range } from "../utils";
 import { DateTime } from "luxon";
 import { useEffect, useRef, useState } from "react";
 import { TimeTableEntry, getDuration } from "../data/entry";
+import { useScroll } from "@prismane/core/hooks";
 
 const HOUR_H = 48;
 const DAY_H = 24 * HOUR_H;
@@ -51,8 +52,14 @@ export default function TimeTable({ start, days: daysN, entries, style, onClickE
     const { getColor: getColor } = usePrismaneColor();
 
     useEffect(() => {
-        ref.current?.scrollIntoView({ block: "center" });
-    }, [entries, ref.current]);
+        const grid = document.getElementById("timetable");
+        if (grid) {
+            grid.scrollTo({
+                top: 6 * HOUR_H,
+                behavior: "smooth"
+            })
+        }
+    });
 
     const days = range(0, daysN)
         .map(i => start.plus({ days: i }));
@@ -73,7 +80,7 @@ export default function TimeTable({ start, days: daysN, entries, style, onClickE
         const h = y / HOUR_H;
         const d = day.set({ hour: h });
         onClickTable(d);
-    }
+    };
 
     return (
         <Grid
@@ -88,6 +95,7 @@ export default function TimeTable({ start, days: daysN, entries, style, onClickE
                 scrollbarColor: `${getColor("base")} transparent`
             }}
             style={style}
+            id="timetable"
         >
             {days.map(day => (
                 <Grid.Item h={10} pos="sticky" rowStart={1} t={0} key={day.day} p={fr(1)}>
@@ -120,7 +128,7 @@ export default function TimeTable({ start, days: daysN, entries, style, onClickE
                 )
             })}
             <Grid.Item rowStart={2} rowEnd={2} columnStart={1} columnSpan="full" pos="relative" z={0} >
-                <Divider bdc="Highlight" t={HOUR_H * currentHour} pos="absolute" ref={ref} />
+                <Divider id="current-time-line" bdc="Highlight" t={HOUR_H * currentHour} pos="absolute" ref={ref} />
             </Grid.Item>
         </Grid>
     )
