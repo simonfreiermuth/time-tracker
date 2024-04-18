@@ -54,19 +54,8 @@ interface TimeTableProps {
 }
 
 export default function TimeTable({ start, days: daysN, entries, style, onClickEntry, onClickTable }: TimeTableProps) {
-    const ref = useRef<HTMLInputElement>(null);
     const { getColor: getColor } = usePrismaneColor();
     const background = useThemeModeValue(["base", 50, 0.5], ["base", 900, 0.5]);
-
-    useEffect(() => {
-        const grid = document.getElementById("timetable");
-        if (grid) {
-            grid.scrollTo({
-                top: 6 * HOUR_H,
-                behavior: "smooth"
-            })
-        }
-    });
 
     const days = range(0, daysN)
         .map(i => start.plus({ days: i }));
@@ -140,15 +129,15 @@ export default function TimeTable({ start, days: daysN, entries, style, onClickE
             })}
             <Grid.Item rowStart={2} rowEnd={2} columnStart={1} columnSpan="full" pos="relative" p={0} z={0} >
                 {range(0, 24).map(h =>
-                    <Divider t={h * HOUR_H} bdc={lineColor} pos="absolute" />
+                    <Divider t={h * HOUR_H} bdc={lineColor} pos="absolute" key={h} />
                 )}
-                <Divider id="current-time-line" bdc="Highlight" t={HOUR_H * currentHour} pos="absolute" ref={ref} />
+                <Divider id="current-time-line" bdc="Highlight" t={HOUR_H * currentHour} pos="absolute" />
             </Grid.Item>
             <Grid.Item rowStart={2} rowEnd={2} columnStart={1} p={0}>
                 {range(0, 25).map(h => {
                     const houer = DateTime.now().set({ hour: h, minute: 0 }).toFormat("HH:mm");
                     return (
-                        <Box h={HOUR_H} key={`${h}-time`} p={fr(1)} bs="border-box" >
+                        <Box h={HOUR_H} key={h} p={fr(1)} bs="border-box" >
                             <Text>{houer}</Text>
                         </Box>
                     )
