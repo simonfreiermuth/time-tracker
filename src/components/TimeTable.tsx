@@ -1,12 +1,11 @@
-import { Grid, fr, Text, Divider, GridItemProps, Card, usePrismaneColor, Box, useThemeModeValue } from "@prismane/core";
+import { Grid, fr, Text, Divider, GridItemProps, Card, usePrismaneColor, Box, useThemeModeValue, Stack } from "@prismane/core";
 import { range } from "../utils";
 import { DateTime } from "luxon";
 import { useEffect, useRef, useState } from "react";
 import { TimeTableEntry, getDuration } from "../data/entry";
-import { useScroll } from "@prismane/core/hooks";
 
 const HOUR_H = 48;
-const DAY_H = 24 * HOUR_H;
+const DAY_H = 25 * HOUR_H;
 
 interface EntryProps {
     entry: TimeTableEntry;
@@ -30,7 +29,14 @@ function Entry({ entry: e, onClick }: EntryProps) {
                 cursor: onClick ? "pointer" : "auto",
             }}
         >
-            <Text fw="bold" fs="xl" cl="white">{duration.toFormat("h:mm")}</Text>
+            <Stack direction="row" align="baseline">
+                <Text fw="bold" fs="xl" cl="white">
+                    {duration.toFormat("h:mm")}
+                </Text>
+                <Text cl="white">
+                    houers
+                </Text>
+            </Stack>
             {e.project &&
                 <Text cl="white">{e.project}</Text>
             }
@@ -68,7 +74,7 @@ export default function TimeTable({ start, days: daysN, entries, style, onClickE
         .groupBy(
             // only show this weeks entries
             // TODO this implementation assumes weeks. Maybe checking weither the table range (start + daysN) overlaps the entry range (start..end)
-            entries.filter(({start: e}) => e.weekNumber === start.weekNumber && e.weekYear === start.weekYear),
+            entries.filter(({ start: e }) => e.weekNumber === start.weekNumber && e.weekYear === start.weekYear),
             ({ start }) => start.day);
 
     const currentHour = DateTime.now().hour + (DateTime.now().minute / 60);
@@ -83,9 +89,11 @@ export default function TimeTable({ start, days: daysN, entries, style, onClickE
         onClickTable(d);
     };
 
+    const lineColor = useThemeModeValue(["base", 200], ["base", 800]);
+
     return (
         <Grid
-            templateColumns={5} gap={fr(1)}
+            templateColumns={6} gap={fr(1)}
             autoRows="auto"
             w="100%"
             h="100%"
@@ -93,23 +101,25 @@ export default function TimeTable({ start, days: daysN, entries, style, onClickE
             sx={{
                 overflowY: "scroll",
                 scrollbarWidth: "thin",
-                scrollbarColor: `${getColor("base")} transparent`
+                scrollbarColor: `${getColor("base")} transparent`,
+                gridTemplateColumns: "max-content repeat(5, 1fr)"
             }}
             style={style}
             id="timetable"
         >
+            <Grid.Item rowStart={1} columnStart={1}></Grid.Item>
             {days.map(day => (
-                <Grid.Item pos="sticky" rowStart={1} t={0} key={day.day} p={fr(1)} z={100} bg={background} sx={{ backdropFilter: "blur(4px)", marginLeft: "-2px", marginRight: "-2px"}} >
+                <Grid.Item pos="sticky" rowStart={1} t={0} key={day.day} p={fr(1)} z={100} bg={background} sx={{ backdropFilter: "blur(4px)", marginLeft: "-2px", marginRight: "-2px" }} >
                     <Text fw="bold" fs="xl">{day.toFormat("EEEE")}</Text>
                 </Grid.Item>
             ))}
             {days.map((d, i) => {
-                const colStart = (i >= 0 && i < 13 ? i + 1 : "auto") as GridItemProps["columnStart"];
+                const colStart = (i >= 0 && i < 13 ? i + 2 : "auto") as GridItemProps["columnStart"];
                 return (
                     <Grid.Item
                         onClick={(e: any) => handleClick(d, e)}
                         rowStart={2} rowEnd={2} columnStart={colStart} r={2}
-                        h={DAY_H} p={fr(1)} pos="relative" key={d.day} z={10}
+                        h={DAY_H} pos="relative" key={d.day} z={10}
                         sx={{
                             cursor: onClickTable ? "pointer" : "auto",
                         }}>
@@ -128,8 +138,21 @@ export default function TimeTable({ start, days: daysN, entries, style, onClickE
                     </Grid.Item>
                 )
             })}
-            <Grid.Item rowStart={2} rowEnd={2} columnStart={1} columnSpan="full" pos="relative" z={0} >
+            <Grid.Item rowStart={2} rowEnd={2} columnStart={1} columnSpan="full" pos="relative" p={0} z={0} >
+                {range(0, 24).map(h =>
+                    <Divider t={h * HOUR_H} bdc={lineColor} pos="absolute" />
+                )}
                 <Divider id="current-time-line" bdc="Highlight" t={HOUR_H * currentHour} pos="absolute" ref={ref} />
+            </Grid.Item>
+            <Grid.Item rowStart={2} rowEnd={2} columnStart={1} p={0}>
+                {range(0, 25).map(h => {
+                    const houer = DateTime.now().set({ hour: h, minute: 0 }).toFormat("HH:mm");
+                    return (
+                        <Box h={HOUR_H} key={`${h}-time`} p={fr(1)} bs="border-box" >
+                            <Text>{houer}</Text>
+                        </Box>
+                    )
+                })}
             </Grid.Item>
         </Grid>
     )
