@@ -1,7 +1,7 @@
 import { Grid, fr, Text, Divider, GridItemProps, Card, usePrismaneColor, Box, useThemeModeValue, Stack } from "@prismane/core";
 import { range } from "../utils";
 import { DateTime } from "luxon";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { TimeTableEntry, getDuration } from "../data/entry";
 
 const HOUR_H = 48;

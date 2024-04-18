@@ -1,4 +1,4 @@
-import { AutocompleteField, Button, Dialog, Field, Flex, NativeDateField, NumberField, Stack, Text, fr, useThemeModeValue } from "@prismane/core";
+import { AutocompleteField, Button, Dialog, Field, Flex, NativeDateField, NumberField, Stack, Text, fr } from "@prismane/core";
 import { useState } from "react";
 import { DateTime } from "luxon";
 import { TimeTableEntry, createEntry } from "../data/entry";
