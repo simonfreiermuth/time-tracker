@@ -87,11 +87,11 @@ export default function EntryForm({ entry, date: initDate, start: initStart, tit
                 <Stack direction="row">
                     <Field.Wrapper>
                         <Field.Label>Start</Field.Label>
-                        <Field value={start?.toFormat("hh:mm")} onChange={updateStart} type="time" name="start" size="xs" />
+                        <Field value={start?.toFormat("HH:mm")} onChange={updateStart} type="time" name="start" size="xs" />
                     </Field.Wrapper>
                     <Field.Wrapper>
                         <Field.Label>End</Field.Label>
-                        <Field value={end?.toFormat("hh:mm")} onChange={updateEnd} type="time" name="end" size="xs" />
+                        <Field value={end?.toFormat("HH:mm")} onChange={updateEnd} type="time" name="end" size="xs" />
                     </Field.Wrapper>
                     <NumberField label="Duration" name="duration" size="md"
                         value={start && end ? end.diff(start).as("hours") : undefined}
