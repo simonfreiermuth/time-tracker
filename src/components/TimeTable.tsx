@@ -109,6 +109,7 @@ export default function TimeTable({ start, days: daysN, entries, style, onClickE
                         onClick={(e: any) => handleClick(d, e)}
                         rowStart={2} rowEnd={2} columnStart={colStart} r={2}
                         h={DAY_H} pos="relative" key={d.day} z={10}
+                        miw={fr(32)}
                         sx={{
                             cursor: onClickTable ? "pointer" : "auto",
                         }}>

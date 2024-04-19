@@ -3,6 +3,7 @@ import { ActionButton, Flex, Header, Image, SegmentedField, Text, Tooltip, fr, u
 import { useAppStore } from "../data/stores";
 import { set } from "idb-keyval";
 import logo from "../../public/icon.png";
+import { useMediaQuery } from "@prismane/core/hooks";
 
 interface HeaderBarProps {
     /** Show the data switch (assumes data store was initialized) */
@@ -12,6 +13,7 @@ interface HeaderBarProps {
 export default function HeaderBar({ dataSwitch }: HeaderBarProps) {
     const toggleThemeModeStore = useAppStore(s => s.toggleThemeMode);
     const { toggleThemeMode, theme } = usePrismaneTheme();
+    const isMobile = useMediaQuery("(max-width: 768px)"); // TODO generalize media queries
 
     const dataSource = useAppStore().dataSource;
     const setDataSource = useAppStore().setDataSource;
@@ -29,7 +31,7 @@ export default function HeaderBar({ dataSwitch }: HeaderBarProps) {
         >
             <Flex direction="row" gap={fr(4)} align="center" mr="auto">
                 <Image src={logo} h={fr(16)} fit="contain" />
-                <Text as="h1" mr="auto">Time tracker</Text>
+                {!isMobile && <Text as="h1" mr="auto">Time tracker</Text>}
             </Flex>
             {dataSwitch && <Tooltip
                 position="bottom-end" size="md" color="primary"
