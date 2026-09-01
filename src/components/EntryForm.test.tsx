@@ -72,7 +72,7 @@ describe("EntryForm — creating an entry", () => {
     it("shows the duration resulting from start and end", () => {
         const f = setup();
         setValue(f.end(), "16:00");
-        expect(f.duration()).toHaveValue("1.5");
+        expect(f.duration()).toHaveValue(1.5);
     });
 
     it("lets the user type a duration instead of an end time", async () => {
@@ -143,7 +143,7 @@ describe("EntryForm — editing an entry", () => {
         expect(f.date()).toHaveValue("2026-09-01");
         expect(f.start()).toHaveValue("09:00");
         expect(f.end()).toHaveValue("11:30");
-        expect(f.duration()).toHaveValue("2.5");
+        expect(f.duration()).toHaveValue(2.5);
         expect(f.project()).toHaveValue("aWall");
     });
 

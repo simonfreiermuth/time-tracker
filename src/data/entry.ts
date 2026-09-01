@@ -31,3 +31,17 @@ export function createEntry(start: DateTime, end: DateTime, project?: string): T
 export function getDuration(entry: TimeTableEntry): Duration<boolean> {
     return entry.end.diff(entry.start);
 }
+/**
+ * Parse a duration in hours from raw field input.
+ * @returns the parsed hours or `undefined` if the input is not a usable number
+ */
+export function parseHours(raw: string): number | undefined {
+    const hours = Number(raw);
+    if (raw.trim() === "" || !Number.isFinite(hours) || hours < 0) return undefined;
+    return hours;
+}
+
+/** Format a duration in hours for a number field (at most two decimals). */
+export function formatHours(hours: number): string {
+    return parseFloat(hours.toFixed(2)).toString();
+}

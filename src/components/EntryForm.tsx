@@ -1,7 +1,7 @@
-import { AutocompleteField, Button, Dialog, Field, Flex, NativeDateField, NumberField, Stack, Text, fr } from "@prismane/core";
+import { AutocompleteField, Button, Dialog, Field, Flex, NativeDateField, Stack, Text, fr } from "@prismane/core";
 import { ChangeEvent, useState } from "react";
 import { DateTime } from "luxon";
-import { TimeTableEntry, createEntry } from "../data/entry";
+import { TimeTableEntry, createEntry, formatHours, parseHours } from "../data/entry";
 
 interface EntryFormProps {
     entry?: TimeTableEntry;
@@ -23,6 +23,9 @@ export default function EntryForm({ entry, date: initDate, start: initStart, tit
     const [end, setEnd] = useState(entry?.end);
     const [project, setProject] = useState(entry?.project ?? "");
     const [deleteOpen, setDeleteOpen] = useState(false);
+    /* Raw duration input, kept only while the user types in that field, so
+    intermediate values ("1." while typing "1.5") survive the round trip. */
+    const [durationInput, setDurationInput] = useState<string>();
 
     const projects = ["TSapp", "ITmeetsOT", "aWall"]; // TODO replace with actual store data
     const options = projects.map(p => ({
@@ -32,37 +35,52 @@ export default function EntryForm({ entry, date: initDate, start: initStart, tit
 
     const updateDate = (event: ChangeEvent<HTMLInputElement>) => {
         const date = DateTime.fromISO(event.target.value);
-        if (!date.isValid) {
-            console.error("could not convert date", date);
-            return;
-        }
+        if (!date.isValid) return;
+        const day = { day: date.day, month: date.month, year: date.year };
         setDate(date);
-        if (start) setStart(start.set({ day: date.day, month: date.month, year: date.year }));
-        if (end) setEnd(end.set({ day: date.day, month: date.month, year: date.year }));
-    };
-    const updateStart = (event: ChangeEvent<HTMLInputElement>) => {
-        const [hour, minute] = event.target.value
-            .split(":")
-            .map((s: string) => parseInt(s));
-        const d = start ?? date;
-        setStart(d.set({ hour: hour, minute: minute }));
-    };
-    const updateEnd = (event: ChangeEvent<HTMLInputElement>) => {
-        const [hour, minute] = event.target.value
-            .split(":")
-            .map((s: string) => parseInt(s));
-        const d = end ?? date;
-        setEnd(d.set({ hour: hour, minute: minute }));
-    };
-    const updateDuration = (event: ChangeEvent<HTMLInputElement>) => {
-        const h = parseInt(event.target.value);
-        console.log("h", h);
-        if (!start) setStart(date);
-        setEnd((start ?? date).plus({ hours: h }));
+        setDurationInput(undefined);
+        if (start) setStart(start.set(day));
+        if (end) setEnd(end.set(day));
     };
 
+    /** Parse a `HH:mm` field value onto the currently selected day. */
+    const timeOf = (value: string) => {
+        const time = DateTime.fromISO(value);
+        return time.isValid
+            ? date.set({ hour: time.hour, minute: time.minute, second: 0, millisecond: 0 })
+            : undefined;
+    };
+
+    const updateStart = (event: ChangeEvent<HTMLInputElement>) => {
+        setDurationInput(undefined);
+        setStart(timeOf(event.target.value));
+    };
+
+    const updateEnd = (event: ChangeEvent<HTMLInputElement>) => {
+        setDurationInput(undefined);
+        setEnd(timeOf(event.target.value));
+    };
+
+    const updateDuration = (event: ChangeEvent<HTMLInputElement>) => {
+        const raw = event.target.value;
+        setDurationInput(raw);
+        const hours = parseHours(raw);
+        if (hours === undefined) {
+            if (raw.trim() === "") setEnd(undefined);
+            return;
+        }
+        const from = start ?? date;
+        setStart(from);
+        setEnd(from.plus({ hours: hours }));
+    };
+
+    const duration = start && end ? end.diff(start).as("hours") : undefined;
+    const durationValue = durationInput ?? (duration !== undefined ? formatHours(duration) : "");
+    const endError = duration !== undefined && duration <= 0 ? "Before start" : undefined;
+    const canSubmit = !!start && !!end && !endError;
+
     const submit = () => {
-        if (!start || !end) return;
+        if (!canSubmit) return;
         const e = entry ? {
             ...entry,
             start: start,
@@ -77,27 +95,27 @@ export default function EntryForm({ entry, date: initDate, start: initStart, tit
         setDeleteOpen(false);
     };
 
-    const canSubmit = start && end;
-
     return (
         <>
             <Stack direction="column" gap={fr(2)} of="visible">
                 <Text as="h2">{title}</Text>
                 <NativeDateField value={date.toISODate() ?? ""} onChange={updateDate} name="date" label="Date" />
-                <Stack direction="row">
+                <Stack direction="row" align="start">
                     <Field.Wrapper>
-                        <Field.Label>Start</Field.Label>
-                        <Field value={start?.toFormat("HH:mm")} onChange={updateStart} type="time" name="start" size="xs" />
+                        <Field.Label htmlFor="start">Start</Field.Label>
+                        <Field value={start?.toFormat("HH:mm") ?? ""} onChange={updateStart} type="time" name="start" id="start" size="xs" />
                     </Field.Wrapper>
                     <Field.Wrapper>
-                        <Field.Label>End</Field.Label>
-                        <Field value={end?.toFormat("HH:mm")} onChange={updateEnd} type="time" name="end" size="xs" />
+                        <Field.Label htmlFor="end">End</Field.Label>
+                        <Field value={end?.toFormat("HH:mm") ?? ""} onChange={updateEnd} type="time" name="end" id="end" size="xs"
+                            error={endError} />
+                        {endError && <Field.Error size="xs">{endError}</Field.Error>}
                     </Field.Wrapper>
-                    <NumberField label="Duration" name="duration" size="md"
-                        value={start && end ? end.diff(start).as("hours") : undefined}
-                        onChange={updateDuration}
-                        min={0}
-                    />
+                    <Field.Wrapper>
+                        <Field.Label htmlFor="duration">Duration</Field.Label>
+                        <Field value={durationValue} onChange={updateDuration} type="number" name="duration" id="duration" size="xs"
+                            min={0} step={0.25} />
+                    </Field.Wrapper>
                 </Stack>
                 <AutocompleteField label="Project"
                     value={project}

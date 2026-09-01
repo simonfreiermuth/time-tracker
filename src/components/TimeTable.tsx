@@ -13,7 +13,7 @@ interface EntryProps {
 }
 
 function Entry({ entry: e, onClick }: EntryProps) {
-    const top = e.start.hour * HOUR_H;
+    const top = (e.start.hour + e.start.minute / 60) * HOUR_H;
     const duration = getDuration(e);
     const height = duration.as("hours") * HOUR_H;
 
@@ -73,8 +73,9 @@ export default function TimeTable({ start, days: daysN, entries, style, onClickE
         if (!tableClickable || !onClickTable) return; // do not fire the event when clicking on an existing entry
         const offsetY = event.currentTarget.getBoundingClientRect().top;
         const y = event.clientY - offsetY;
-        const h = y / HOUR_H;
-        onClickTable(day.set({ hour: h }));
+        // Luxon only takes whole units, so snap the clicked position to quarter hours
+        const minutes = Math.round((y / HOUR_H) * 4) * 15;
+        onClickTable(day.startOf("day").plus({ minutes: Math.min(minutes, 23 * 60 + 45) }));
     };
 
     const lineColor = useThemeModeValue(["base", 200], ["base", 800]);
