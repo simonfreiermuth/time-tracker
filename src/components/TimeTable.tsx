@@ -1,7 +1,7 @@
 import { Grid, fr, Text, Divider, GridItemProps, Card, usePrismaneColor, Box, useThemeModeValue, Stack } from "@prismane/core";
 import { range } from "../utils";
 import { DateTime } from "luxon";
-import { MouseEvent, useState } from "react";
+import { MouseEvent, useEffect, useRef, useState } from "react";
 import { TimeTableEntry, getDuration } from "../data/entry";
 import { colorOf } from "../data/project";
 import { useDataStore } from "../data/useDataStore";
@@ -71,6 +71,18 @@ export default function TimeTable({ start, days: daysN, entries, style, onClickE
 
     const currentHour = DateTime.now().hour + (DateTime.now().minute / 60);
 
+    // open the table around the current time instead of at midnight
+    const table = useRef<HTMLDivElement>(null);
+    useEffect(() => {
+        // wait for the layout, the grid has no scroll height yet while mounting
+        const frame = requestAnimationFrame(() => {
+            const el = table.current;
+            if (el) el.scrollTop = HOUR_H * currentHour - el.clientHeight / 2;
+        });
+        return () => cancelAnimationFrame(frame);
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- only on mount
+    }, []);
+
     const [tableClickable, setTableClickable] = useState(true);
     const handleClick = (day: DateTime<true>, event: MouseEvent<HTMLDivElement>) => {
         if (!tableClickable || !onClickTable) return; // do not fire the event when clicking on an existing entry
@@ -98,6 +110,7 @@ export default function TimeTable({ start, days: daysN, entries, style, onClickE
             }}
             style={style}
             id="timetable"
+            ref={table}
         >
             <Grid.Item rowStart={1} columnStart={1}></Grid.Item>
             {days.map(day => (
