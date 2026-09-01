@@ -1,6 +1,7 @@
 import { Tabs, Box, useThemeModeValue, Flex } from "@prismane/core"
 import "@fontsource/inter";
 import TimeTableScreen from "./screens/TimeTableScreen";
+import ProjectsScreen from "./screens/ProjectsScreen";
 import HeaderBar from "./components/HeaderBar";
 import { CalendarIcon, FileIcon, SquaresFourIcon } from "@phosphor-icons/react";
 import { useMediaQuery } from "@prismane/core/hooks";
@@ -35,6 +36,7 @@ function App() {
           </Tabs.Tab>
         </Flex>
         <Tabs.Panel value="calendar"><TimeTableScreen /></Tabs.Panel>
+        <Tabs.Panel value="projects"><ProjectsScreen /></Tabs.Panel>
       </Tabs>
     </Box>
   );

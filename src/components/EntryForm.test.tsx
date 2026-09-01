@@ -125,6 +125,19 @@ describe("EntryForm — creating an entry", () => {
         expect(f.onSubmit.mock.calls[0][0].project).toBe("TSapp");
     });
 
+    it("offers the projects from the store, without the archived ones", () => {
+        renderUI(<EntryForm title="Create new entry" date={CLICKED} start={CLICKED} onSubmit={vi.fn()} onCancel={vi.fn()} />, {
+            projects: [
+                { id: "1", name: "aWall", color: "teal" },
+                { id: "2", name: "TSapp", color: "violet", archived: true },
+            ],
+        });
+        fireEvent.click(screen.getByLabelText("Project"));
+
+        expect(screen.getByText("aWall")).toBeInTheDocument();
+        expect(screen.queryByText("TSapp")).not.toBeInTheDocument();
+    });
+
     it("cancels without submitting", () => {
         const f = setup();
         fireEvent.click(screen.getByRole("button", { name: "Cancel" }));

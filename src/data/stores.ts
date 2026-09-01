@@ -1,15 +1,21 @@
 import { create, createStore } from "zustand";
 import { TimeTableEntry } from "./entry";
+import { Project } from "./project";
 import { DateTime } from "luxon";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { dualStorage } from "./dualStorage";
 
 export interface DataStoreState {
     entries: TimeTableEntry[];
+    projects: Project[];
 
     addEntry: (entry: TimeTableEntry) => void;
     updateEntry: (entry: TimeTableEntry) => void;
     deleteEntry: (entry: TimeTableEntry) => void;
+
+    addProject: (project: Project) => void;
+    updateProject: (project: Project) => void;
+    deleteProject: (project: Project) => void;
 }
 
 export type DataStore = ReturnType<typeof createDataStore>;
@@ -18,15 +24,21 @@ export const createDataStore = (fileHandle?: FileSystemFileHandle) => {
     return createStore<DataStoreState>()(
         persist((set, get) => ({
             entries: [],
+            projects: [],
 
             addEntry: (entry) => set({ entries: [...get().entries, entry] }),
             updateEntry: (entry) => set({ entries: [...get().entries.filter(e => e.id !== entry.id), entry] }),
             deleteEntry: (entry) => set({ entries: [...get().entries.filter(e => e.id !== entry.id)] }),
+
+            addProject: (project) => set({ projects: [...get().projects, project] }),
+            updateProject: (project) => set({ projects: get().projects.map(p => p.id === project.id ? project : p) }),
+            deleteProject: (project) => set({ projects: get().projects.filter(p => p.id !== project.id) }),
         }), {
             name: "data-storage",
             storage: createJSONStorage(() => dualStorage(fileHandle), {
-                reviver: (_, value) => {
-                    if (typeof value === "string") { // parse any valid date to a DateTime object
+                reviver: (key, value) => {
+                    // only entry timestamps are dates — other strings must stay strings
+                    if ((key === "start" || key === "end") && typeof value === "string") {
                         const d = DateTime.fromISO(value);
                         if (d.isValid) return d;
                     }

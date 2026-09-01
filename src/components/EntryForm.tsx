@@ -2,6 +2,7 @@ import { AutocompleteField, Button, Dialog, Field, Flex, NativeDateField, Stack,
 import { ChangeEvent, useState } from "react";
 import { DateTime } from "luxon";
 import { TimeTableEntry, createEntry, formatHours, parseHours } from "../data/entry";
+import { useDataStore } from "../data/useDataStore";
 
 interface EntryFormProps {
     entry?: TimeTableEntry;
@@ -27,11 +28,9 @@ export default function EntryForm({ entry, date: initDate, start: initStart, tit
     intermediate values ("1." while typing "1.5") survive the round trip. */
     const [durationInput, setDurationInput] = useState<string>();
 
-    const projects = ["TSapp", "ITmeetsOT", "aWall"]; // TODO replace with actual store data
-    const options = projects.map(p => ({
-        value: p,
-        element: p
-    }));
+    const options = useDataStore(s => s.projects)
+        .filter(p => !p.archived || p.name === entry?.project)
+        .map(p => ({ value: p.name, element: p.name }));
 
     const updateDate = (event: ChangeEvent<HTMLInputElement>) => {
         const date = DateTime.fromISO(event.target.value);

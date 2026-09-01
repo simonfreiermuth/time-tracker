@@ -3,6 +3,8 @@ import { range } from "../utils";
 import { DateTime } from "luxon";
 import { MouseEvent, useState } from "react";
 import { TimeTableEntry, getDuration } from "../data/entry";
+import { colorOf } from "../data/project";
+import { useDataStore } from "../data/useDataStore";
 
 const HOUR_H = 48;
 const DAY_H = 25 * HOUR_H;
@@ -13,6 +15,7 @@ interface EntryProps {
 }
 
 function Entry({ entry: e, onClick }: EntryProps) {
+    const color = useDataStore(s => colorOf(s.projects, e.project));
     const top = (e.start.hour + e.start.minute / 60) * HOUR_H;
     const duration = getDuration(e);
     const height = duration.as("hours") * HOUR_H;
@@ -23,7 +26,7 @@ function Entry({ entry: e, onClick }: EntryProps) {
         <Card
             t={top} h={height} w="100%"
             bs="border-box" direction="column"
-            pos="absolute" bg="primary"
+            pos="absolute" bg={color === "primary" ? "primary" : [color, 500]}
             onClick={handleClick}
             sx={{
                 cursor: onClick ? "pointer" : "auto",
