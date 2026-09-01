@@ -1,30 +1,54 @@
-# React + TypeScript + Vite
+# Time Tracker ⏱
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A "backend-less" small PWA for tracking working hours in a calendar view. 
 
-Currently, two official plugins are available:
+> Note: 
+> The primary purpose of this project was **learning and experimenting with the browser [File System Access API](https://developer.mozilla.org/en-US/docs/Web/API/File_System_API)**.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## How it works
 
-## Expanding the ESLint configuration
+On first launch you choose where data lives:
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+- **Open existing file** — `showOpenFilePicker()` to pick a `.json` file.
+- **Create new file** — `showDirectoryPicker()` to pick a folder, then write a new `data-*.json` into it.
+- **Use local storage** — fall back to `localStorage` (works everywhere, no file access).
 
-- Configure the top-level `parserOptions` property like this:
+The chosen `FileSystemFileHandle` is persisted in IndexedDB (via `idb-keyval`) so it can be
+re-opened on the next visit without re-prompting. State is managed with Zustand, whose `persist`
+middleware is wired to a custom `dualStorage` adapter that reads/writes the file handle and mirrors
+to `localStorage` (`src/data/dualStorage.ts`).
 
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
+> The File System Access API requires a **secure context** (HTTPS or `localhost`) and is currently
+> only supported in Chromium-based browsers.
+
+## Tech stack
+
+React + TypeScript, Vite (SWC), Zustand, Luxon, [Prismane](https://www.prismane.io/) UI,
+`vite-plugin-pwa` for the service worker / installable manifest.
+
+## Run locally
+
+```bash
+npm install
+npm run dev      # start the Vite dev server (PWA enabled in dev)
 ```
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+Then open the printed `localhost` URL. Other scripts:
+
+```bash
+npm run build    # type-check + production build into dist/
+npm run preview  # serve the production build locally
+npm run lint     # eslint
+```
+
+## Deploy
+
+Hosted on **Firebase Hosting** (project `pwa-time-tracker`, config in `firebase.json`).
+
+```bash
+npm run build
+firebase deploy
+```
+
+Requires the Firebase CLI (`npm i -g firebase-tools`) and `firebase login`. The hosting config
+serves the `dist/` folder and rewrites all routes to `index.html` (SPA).
