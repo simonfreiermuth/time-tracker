@@ -2,7 +2,7 @@ import TimeTable from "../components/TimeTable";
 import { DateTime } from "luxon";
 import { ActionButton, Button, Flex, Modal, NativeDateField, Stack, fr } from "@prismane/core";
 import { ChangeEvent, useState } from "react";
-import { CaretLeft, CaretRight } from "@phosphor-icons/react";
+import { CaretLeftIcon, CaretRightIcon } from "@phosphor-icons/react";
 import EntryForm from "../components/EntryForm";
 import { TimeTableEntry } from "../data/entry";
 import { useDataStore } from "../data/useDataStore";
@@ -55,10 +55,10 @@ export default function TimeTableScreen() {
   return (
     <Stack w="100%" p={fr(4)} bs="border-box">
       <Stack direction="row" w="100%" justify="center" align="center">
-        <ActionButton icon={<CaretLeft size={32} />} onClick={lastWeek} />
+        <ActionButton icon={<CaretLeftIcon size={32} />} onClick={lastWeek} />
         <NativeDateField name="date" value={date.toISODate()} onChange={(e: ChangeEvent<HTMLInputElement>) => updateDate(e.target.value)} />
         <Button onClick={() => setDate(thisWeek)} size="md">This week</Button>
-        <ActionButton icon={<CaretRight size={32} />} onClick={nextWeek} />
+        <ActionButton icon={<CaretRightIcon size={32} />} onClick={nextWeek} />
       </Stack>
       <Flex w="100%" of="hidden">
         <TimeTable

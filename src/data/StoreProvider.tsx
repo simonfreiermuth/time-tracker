@@ -3,7 +3,7 @@ import { DataStore, createDataStore, useAppStore } from "./stores";
 import { StoreContext } from "./useDataStore";
 import { ActionButton, Alert, Box, Card, Center, Divider, fr, useThemeModeValue, useToast } from "@prismane/core";
 import HeaderBar from "../components/HeaderBar";
-import { File, FileDashed, FileText } from "@phosphor-icons/react";
+import { FileDashedIcon, FileIcon, FileTextIcon } from "@phosphor-icons/react";
 import { get, set } from "idb-keyval";
 
 /**
@@ -96,7 +96,7 @@ export default function DataStoreProvider(props: PropsWithChildren) {
                 <Card h={fr(30)} align="center" direction="row" p={fr(4)} gap={fr(4)} m={fr(16)}>
                     <ActionButton
                         size="lg"
-                        icon={<FileText size={32} />}
+                        icon={<FileTextIcon size={32} />}
                         onClick={openFile}
                         sx={{ flexDirection: "column" }}
                     >
@@ -104,7 +104,7 @@ export default function DataStoreProvider(props: PropsWithChildren) {
                     </ActionButton>
                     <ActionButton
                         size="lg"
-                        icon={<File size={32} />}
+                        icon={<FileIcon size={32} />}
                         onClick={createFile}
                         sx={{ flexDirection: "column" }}
                     >
@@ -113,7 +113,7 @@ export default function DataStoreProvider(props: PropsWithChildren) {
                     <Divider orientation="vertical" />
                     <ActionButton
                         size="lg"
-                        icon={<FileDashed size={32} />}
+                        icon={<FileDashedIcon size={32} />}
                         onClick={useLocalStorage}
                         sx={{ flexDirection: "column" }}
                     >

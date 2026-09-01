@@ -1,4 +1,4 @@
-import { Moon, Sun } from "@phosphor-icons/react";
+import { MoonIcon, SunIcon } from "@phosphor-icons/react";
 import { ActionButton, Flex, Header, Image, SegmentedField, Text, Tooltip, fr, usePrismaneTheme, useThemeModeValue } from "@prismane/core";
 import { DataSource, useAppStore } from "../data/stores";
 import { ChangeEvent } from "react";
@@ -52,7 +52,7 @@ export default function HeaderBar({ dataSwitch }: HeaderBarProps) {
             <ActionButton
                 onClick={toggle}
                 size="md"
-                icon={theme.mode === "light" ? <Moon /> : <Sun />}
+                icon={theme.mode === "light" ? <MoonIcon /> : <SunIcon />}
             />
         </Header>
     )

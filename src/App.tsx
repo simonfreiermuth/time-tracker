@@ -2,7 +2,7 @@ import { Tabs, Box, useThemeModeValue, Flex } from "@prismane/core"
 import "@fontsource/inter";
 import TimeTableScreen from "./screens/TimeTableScreen";
 import HeaderBar from "./components/HeaderBar";
-import { Calendar, File, SquaresFour } from "@phosphor-icons/react";
+import { CalendarIcon, FileIcon, SquaresFourIcon } from "@phosphor-icons/react";
 import { useMediaQuery } from "@prismane/core/hooks";
 
 function App() {
@@ -22,15 +22,15 @@ function App() {
           zIndex: 100
         }:{}} >
           <Tabs.Tab value="calendar" direction="column" align="center" justify="center" w="100%" bs="border-box">
-            <Calendar size={32} />
+            <CalendarIcon size={32} />
             Calendar
           </Tabs.Tab>
           <Tabs.Tab value="projects" direction="column" align="center" justify="center" w="100%" bs="border-box">
-            <SquaresFour size={32} />
+            <SquaresFourIcon size={32} />
             Projects
           </Tabs.Tab>
           <Tabs.Tab value="report" direction="column" align="center" justify="center" w="100%" bs="border-box">
-            <File size={32} />
+            <FileIcon size={32} />
             Report
           </Tabs.Tab>
         </Flex>
