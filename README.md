@@ -44,9 +44,8 @@ pnpm test      # vitest (jsdom + Testing Library)
 
 ## Deploy
 
-Hosted on **Firebase Hosting** (project `pwa-time-tracker`, see `firebase.json`):
+Pushed to `main` → [CI](.github/workflows/ci.yml) runs lint, tests and build, then publishes
+`dist/` to **GitHub Pages**: <https://simonfreiermuth.github.io/time-tracker/>
 
-```bash
-pnpm build
-firebase deploy
-```
+The repository needs *Settings → Pages → Source: GitHub Actions*. The site lives under a
+sub-path, hence `base: "/time-tracker/"` in `vite.config.ts`.
