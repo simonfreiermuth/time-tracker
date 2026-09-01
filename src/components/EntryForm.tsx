@@ -1,5 +1,5 @@
 import { AutocompleteField, Button, Dialog, Field, Flex, NativeDateField, NumberField, Stack, Text, fr } from "@prismane/core";
-import { useState } from "react";
+import { ChangeEvent, useState } from "react";
 import { DateTime } from "luxon";
 import { TimeTableEntry, createEntry } from "../data/entry";
 
@@ -30,7 +30,7 @@ export default function EntryForm({ entry, date: initDate, start: initStart, tit
         element: p
     }));
 
-    const updateDate = (event: any) => {
+    const updateDate = (event: ChangeEvent<HTMLInputElement>) => {
         const date = DateTime.fromISO(event.target.value);
         if (!date.isValid) {
             console.error("could not convert date", date);
@@ -40,21 +40,21 @@ export default function EntryForm({ entry, date: initDate, start: initStart, tit
         if (start) setStart(start.set({ day: date.day, month: date.month, year: date.year }));
         if (end) setEnd(end.set({ day: date.day, month: date.month, year: date.year }));
     };
-    const updateStart = (event: any) => {
+    const updateStart = (event: ChangeEvent<HTMLInputElement>) => {
         const [hour, minute] = event.target.value
             .split(":")
             .map((s: string) => parseInt(s));
         const d = start ?? date;
         setStart(d.set({ hour: hour, minute: minute }));
     };
-    const updateEnd = (event: any) => {
+    const updateEnd = (event: ChangeEvent<HTMLInputElement>) => {
         const [hour, minute] = event.target.value
             .split(":")
             .map((s: string) => parseInt(s));
         const d = end ?? date;
         setEnd(d.set({ hour: hour, minute: minute }));
     };
-    const updateDuration = (event: any) => {
+    const updateDuration = (event: ChangeEvent<HTMLInputElement>) => {
         const h = parseInt(event.target.value);
         console.log("h", h);
         if (!start) setStart(date);
@@ -101,7 +101,7 @@ export default function EntryForm({ entry, date: initDate, start: initStart, tit
                 </Stack>
                 <AutocompleteField label="Project"
                     value={project}
-                    onChange={(e: any) => setProject(e.target.value ?? "")}
+                    onChange={(e: ChangeEvent<HTMLInputElement>) => setProject(e.target.value ?? "")}
                     options={options}
                 />
                 <Flex gap={fr(1)} align="center">

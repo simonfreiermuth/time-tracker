@@ -1,9 +1,9 @@
-import { Tabs, Box, useThemeModeValue, Flex } from '@prismane/core'
+import { Tabs, Box, useThemeModeValue, Flex } from "@prismane/core"
 import "@fontsource/inter";
-import TimeTableScreen from './screens/TimeTableScreen';
-import HeaderBar from './components/HeaderBar';
-import { Calendar, File, SquaresFour } from '@phosphor-icons/react';
-import { useMediaQuery } from '@prismane/core/hooks';
+import TimeTableScreen from "./screens/TimeTableScreen";
+import HeaderBar from "./components/HeaderBar";
+import { Calendar, File, SquaresFour } from "@phosphor-icons/react";
+import { useMediaQuery } from "@prismane/core/hooks";
 
 function App() {
   const background = useThemeModeValue(["base", 50], ["base", 900]);

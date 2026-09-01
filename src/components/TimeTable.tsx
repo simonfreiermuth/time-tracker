@@ -1,7 +1,7 @@
 import { Grid, fr, Text, Divider, GridItemProps, Card, usePrismaneColor, Box, useThemeModeValue, Stack } from "@prismane/core";
 import { range } from "../utils";
 import { DateTime } from "luxon";
-import { useState } from "react";
+import { MouseEvent, useState } from "react";
 import { TimeTableEntry, getDuration } from "../data/entry";
 
 const HOUR_H = 48;
@@ -34,7 +34,7 @@ function Entry({ entry: e, onClick }: EntryProps) {
                     {duration.toFormat("h:mm")}
                 </Text>
                 <Text cl="white">
-                    houers
+                    hours
                 </Text>
             </Stack>
             {e.project &&
@@ -45,7 +45,7 @@ function Entry({ entry: e, onClick }: EntryProps) {
 }
 
 interface TimeTableProps {
-    start: DateTime;
+    start: DateTime<true>;
     days: number;
     entries: TimeTableEntry[];
     style?: React.CSSProperties;
@@ -62,20 +62,19 @@ export default function TimeTable({ start, days: daysN, entries, style, onClickE
     const entriesPerDay = Object
         .groupBy(
             // only show this weeks entries
-            // TODO this implementation assumes weeks. Maybe checking weither the table range (start + daysN) overlaps the entry range (start..end)
+            // TODO this implementation assumes weeks. Maybe check whether the table range (start + daysN) overlaps the entry range (start..end)
             entries.filter(({ start: e }) => e.weekNumber === start.weekNumber && e.weekYear === start.weekYear),
             ({ start }) => start.day);
 
     const currentHour = DateTime.now().hour + (DateTime.now().minute / 60);
 
     const [tableClickable, setTableClickable] = useState(true);
-    const handleClick = (day: DateTime<true>, event: any) => {
+    const handleClick = (day: DateTime<true>, event: MouseEvent<HTMLDivElement>) => {
         if (!tableClickable || !onClickTable) return; // do not fire the event when clicking on an existing entry
-        const offsetY: number = event.target.getBoundingClientRect().top;
+        const offsetY = event.currentTarget.getBoundingClientRect().top;
         const y = event.clientY - offsetY;
         const h = y / HOUR_H;
-        const d = day.set({ hour: h });
-        onClickTable(d);
+        onClickTable(day.set({ hour: h }));
     };
 
     const lineColor = useThemeModeValue(["base", 200], ["base", 800]);
@@ -106,7 +105,7 @@ export default function TimeTable({ start, days: daysN, entries, style, onClickE
                 const colStart = (i >= 0 && i < 13 ? i + 2 : "auto") as GridItemProps["columnStart"];
                 return (
                     <Grid.Item
-                        onClick={(e: any) => handleClick(d, e)}
+                        onClick={(e: MouseEvent<HTMLDivElement>) => handleClick(d, e)}
                         rowStart={2} rowEnd={2} columnStart={colStart} r={2}
                         h={DAY_H} pos="relative" key={d.day} z={10}
                         miw={fr(32)}
@@ -136,10 +135,10 @@ export default function TimeTable({ start, days: daysN, entries, style, onClickE
             </Grid.Item>
             <Grid.Item rowStart={2} rowEnd={2} columnStart={1} p={0}>
                 {range(0, 25).map(h => {
-                    const houer = DateTime.now().set({ hour: h, minute: 0 }).toFormat("HH:mm");
+                    const hour = DateTime.now().set({ hour: h, minute: 0 }).toFormat("HH:mm");
                     return (
                         <Box h={HOUR_H} key={h} p={fr(1)} bs="border-box" >
-                            <Text>{houer}</Text>
+                            <Text>{hour}</Text>
                         </Box>
                     )
                 })}

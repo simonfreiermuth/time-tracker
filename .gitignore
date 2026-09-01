@@ -24,6 +24,3 @@ dev-dist
 *.njsproj
 *.sln
 *.sw?
-
-# Firebase
-.firebase

@@ -1,6 +1,7 @@
 import { Moon, Sun } from "@phosphor-icons/react";
 import { ActionButton, Flex, Header, Image, SegmentedField, Text, Tooltip, fr, usePrismaneTheme, useThemeModeValue } from "@prismane/core";
-import { useAppStore } from "../data/stores";
+import { DataSource, useAppStore } from "../data/stores";
+import { ChangeEvent } from "react";
 import { set } from "idb-keyval";
 import logo from "../../public/icon.png";
 import { useMediaQuery } from "@prismane/core/hooks";
@@ -15,8 +16,8 @@ export default function HeaderBar({ dataSwitch }: HeaderBarProps) {
     const { toggleThemeMode, theme } = usePrismaneTheme();
     const isMobile = useMediaQuery("(max-width: 768px)"); // TODO generalize media queries
 
-    const dataSource = useAppStore().dataSource;
-    const setDataSource = useAppStore().setDataSource;
+    const dataSource = useAppStore(s => s.dataSource);
+    const setDataSource = useAppStore(s => s.setDataSource);
 
     const toggle = () => {
         toggleThemeMode();
@@ -35,11 +36,11 @@ export default function HeaderBar({ dataSwitch }: HeaderBarProps) {
             </Flex>
             {dataSwitch && <Tooltip
                 position="bottom-end" size="md" color="primary"
-                label="Store data in a local file or browsers localStorage" >
+                label="Store data in a local file or the browser's localStorage" >
                 <SegmentedField
                     value={dataSource}
-                    onChange={async (e: any) => {
-                        setDataSource(e.target.value);
+                    onChange={async (e: ChangeEvent<HTMLInputElement>) => {
+                        setDataSource(e.target.value as DataSource);
                         await set("filehandle", undefined); // TODO generally handle this in less random places
                     }}
                     options={[

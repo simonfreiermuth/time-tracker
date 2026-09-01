@@ -25,8 +25,8 @@ export const createDataStore = (fileHandle?: FileSystemFileHandle) => {
         }), {
             name: "data-storage",
             storage: createJSONStorage(() => dualStorage(fileHandle), {
-                reviver: (_, value: any) => {
-                    if (value) { // parse any valid date to a DateTime object
+                reviver: (_, value) => {
+                    if (typeof value === "string") { // parse any valid date to a DateTime object
                         const d = DateTime.fromISO(value);
                         if (d.isValid) return d;
                     }
@@ -37,12 +37,14 @@ export const createDataStore = (fileHandle?: FileSystemFileHandle) => {
     );
 };
 
+export type DataSource = "localStorage" | "file";
+
 export interface AppStore {
     themeMode: "light" | "dark";
-    dataSource?: "localStorage" | "file";
+    dataSource?: DataSource;
 
     toggleThemeMode: () => void;
-    setDataSource: (source: "localStorage" | "file") => void;
+    setDataSource: (source: DataSource) => void;
 }
 
 export const useAppStore = create<AppStore>()(
