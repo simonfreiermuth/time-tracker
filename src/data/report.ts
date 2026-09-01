@@ -1,4 +1,4 @@
-import { DateTime, Interval } from "luxon";
+import { DateTime, Duration, Interval } from "luxon";
 import { TimeTableEntry, getDuration } from "./entry";
 
 /** Hours worked on one project (`project` is undefined for unassigned entries). */
@@ -41,4 +41,9 @@ export function hoursPerProject(entries: TimeTableEntry[], period: Interval): Pr
 
 export function totalHours(rows: ProjectHours[]): number {
     return rows.reduce((sum, r) => sum + r.hours, 0);
+}
+
+/** Format a number of hours as `hh:mm`. */
+export function formatHoursMinutes(hours: number): string {
+    return Duration.fromObject({ hours }).toFormat("hh:mm");
 }

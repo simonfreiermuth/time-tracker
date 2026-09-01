@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { DateTime } from "luxon";
 import { createEntry } from "./entry";
-import { hoursPerProject, labelOf, periodOf, totalHours } from "./report";
+import { formatHoursMinutes, hoursPerProject, labelOf, periodOf, totalHours } from "./report";
 
 const entry = (day: number, hours: number, project?: string) =>
     createEntry(
@@ -45,6 +45,15 @@ describe("hoursPerProject", () => {
 describe("totalHours", () => {
     it("adds every row up", () => {
         expect(totalHours(hoursPerProject([entry(1, 2, "a"), entry(1, 3)], periodOf(SEPTEMBER_1, "week")))).toBe(5);
+    });
+});
+
+describe("formatHoursMinutes", () => {
+    it("formats hours as hh:mm", () => {
+        expect(formatHoursMinutes(0)).toBe("00:00");
+        expect(formatHoursMinutes(3.5)).toBe("03:30");
+        expect(formatHoursMinutes(0.25)).toBe("00:15");
+        expect(formatHoursMinutes(123.75)).toBe("123:45");
     });
 });
 

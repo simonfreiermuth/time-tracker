@@ -34,10 +34,10 @@ describe("ReportScreen", () => {
         });
 
         expect(screen.getByText("Week 38 · 14.09. – 20.09.2026")).toBeInTheDocument();
-        expect(row("aWall")).toHaveTextContent("3.5");
-        expect(row("(no project)")).toHaveTextContent("1");
+        expect(row("aWall")).toHaveTextContent("03:30");
+        expect(row("(no project)")).toHaveTextContent("01:00");
         expect(screen.queryByText("TSapp")).not.toBeInTheDocument();
-        expect(row("Total")).toHaveTextContent("4.5");
+        expect(row("Total")).toHaveTextContent("04:30");
     });
 
     it("steps to the previous period", () => {
@@ -47,7 +47,7 @@ describe("ReportScreen", () => {
         fireEvent.click(screen.getByRole("button", { name: "Previous" }));
 
         expect(screen.getByText("Week 37 · 07.09. – 13.09.2026")).toBeInTheDocument();
-        expect(row("aWall")).toHaveTextContent("3");
+        expect(row("aWall")).toHaveTextContent("03:00");
     });
 
     it("switches to a monthly report", () => {
@@ -56,7 +56,7 @@ describe("ReportScreen", () => {
         fireEvent.click(screen.getByText("month"));
 
         expect(screen.getByText("September 2026")).toBeInTheDocument();
-        expect(row("TSapp")).toHaveTextContent("8");
-        expect(row("Total")).toHaveTextContent("10");
+        expect(row("TSapp")).toHaveTextContent("08:00");
+        expect(row("Total")).toHaveTextContent("10:00");
     });
 });

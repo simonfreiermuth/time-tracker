@@ -2,8 +2,7 @@ import { ActionButton, Card, Center, SegmentedField, Stack, Table, Text, fr } fr
 import { CaretLeftIcon, CaretRightIcon } from "@phosphor-icons/react";
 import { DateTime } from "luxon";
 import { ChangeEvent, useState } from "react";
-import { ReportUnit, hoursPerProject, labelOf, periodOf, totalHours } from "../data/report";
-import { formatHours } from "../data/entry";
+import { ReportUnit, formatHoursMinutes, hoursPerProject, labelOf, periodOf, totalHours } from "../data/report";
 import { useDataStore } from "../data/useDataStore";
 
 export default function ReportScreen() {
@@ -42,14 +41,14 @@ export default function ReportScreen() {
                             {rows.map(r => (
                                 <Table.Row key={r.project ?? ""}>
                                     <Table.Cell>{r.project ?? "(no project)"}</Table.Cell>
-                                    <Table.Cell ta="right">{formatHours(r.hours)}</Table.Cell>
+                                    <Table.Cell ta="right">{formatHoursMinutes(r.hours)}</Table.Cell>
                                 </Table.Row>
                             ))}
                         </Table.Body>
                         <Table.Foot>
                             <Table.Row>
                                 <Table.Cell fw="bold">Total</Table.Cell>
-                                <Table.Cell fw="bold" ta="right">{formatHours(totalHours(rows))}</Table.Cell>
+                                <Table.Cell fw="bold" ta="right">{formatHoursMinutes(totalHours(rows))}</Table.Cell>
                             </Table.Row>
                         </Table.Foot>
                     </Table>
