@@ -24,11 +24,6 @@ Syncing and backup are up to you — put the file wherever you already sync (Dro
 > The File System Access API needs a **secure context** (HTTPS or `localhost`) and currently only
 > works in Chromium-based browsers.
 
-## Stack
-
-React + TypeScript, Vite (SWC), Zustand, Luxon, [Prismane](https://www.prismane.io/) UI,
-`vite-plugin-pwa` for the service worker and installable manifest, Vitest + Testing Library
-for tests.
 
 ## Development
 
