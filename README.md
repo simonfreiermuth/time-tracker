@@ -1,6 +1,7 @@
 # Time Tracker ⏱
 
-A backend-less PWA for tracking working hours in a calendar view.
+A backend-less PWA for tracking working hours: a weekly calendar, a project list and a simple
+report of hours per project.
 
 > Note:
 > The primary purpose of this project was **learning and experimenting with the browser
