@@ -62,6 +62,8 @@ describe("ProjectForm", () => {
         expect(screen.getByLabelText("Archived")).not.toBeChecked();
 
         fireEvent.click(screen.getByLabelText("Archived"));
+        expect(screen.getByLabelText("Archived")).toBeChecked();
+        expect(document.querySelector(".PrismaneSwitch-root-active")).toBeInTheDocument();
         click("Save");
 
         expect(f.onSubmit.mock.calls[0][0]).toMatchObject({ id: "1", name: "aWall", archived: true });

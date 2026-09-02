@@ -58,7 +58,8 @@ export default function ProjectForm({ project, taken, title, onSubmit, onCancel,
                 </Field.Wrapper>
                 <TextareaField label="Description" name="description" value={description}
                     onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setDescription(e.target.value)} />
-                <Switch label="Archived" name="archived" checked={archived}
+                {/* Prismane draws the switch from `value`, not `checked` — without it the knob never moves. */}
+                <Switch label="Archived" name="archived" checked={archived} value={archived ? "on" : ""}
                     onChange={(e: ChangeEvent<HTMLInputElement>) => setArchived(e.target.checked)} />
                 <Flex gap={fr(1)} align="center">
                     {onDelete && <Button onClick={() => setDeleteOpen(true)} variant="tertiary">Delete</Button>}
