@@ -70,3 +70,26 @@ export function totalHours(rows: ProjectHours[]): number {
 export function formatHoursMinutes(hours: number): string {
     return Duration.fromObject({ hours }).toFormat("hh:mm");
 }
+
+/** Hours worked in one bucket of a period — a day of a week, a week of a month. */
+export interface BucketHours {
+    label: string;
+    hours: number;
+}
+
+/** Sum the period's hours over its natural buckets: days for a week, calendar weeks for a month. */
+export function hoursPerBucket(entries: TimeTableEntry[], period: Interval, unit: ReportUnit): BucketHours[] {
+    const inPeriod = entriesInPeriod(entries, period);
+    const step = unit === "week" ? "day" : "week";
+    const buckets: BucketHours[] = [];
+    for (let t = period.start?.startOf(step); t && period.end && t < period.end; t = t.plus({ [step]: 1 })) {
+        const bucket = Interval.after(t, { [step]: 1 });
+        buckets.push({
+            label: unit === "week" ? t.toFormat("EEE") : `W${t.weekNumber}`,
+            hours: inPeriod
+                .filter(e => bucket.contains(e.start))
+                .reduce((sum, e) => sum + getDuration(e).as("hours"), 0),
+        });
+    }
+    return buckets;
+}

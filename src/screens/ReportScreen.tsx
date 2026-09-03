@@ -1,10 +1,12 @@
-import { ActionButton, Button, Card, Center, SegmentedField, Stack, Table, Text, fr } from "@prismane/core";
-import { CaretLeftIcon, CaretRightIcon, CheckIcon, MinusIcon } from "@phosphor-icons/react";
+import { ActionButton, Button, Card, Center, Divider, SegmentedField, Stack, Table, Tabs, Text, fr } from "@prismane/core";
+import { CaretLeftIcon, CaretRightIcon, ChartBarIcon, ChartPieIcon, CheckIcon, MinusIcon } from "@phosphor-icons/react";
 import { DateTime } from "luxon";
 import { ChangeEvent, useState } from "react";
-import { ExportState, ReportUnit, entriesInPeriod, entriesOfProject, exportStateOf, formatHoursMinutes, hoursPerProject, labelOf, periodOf, totalHours } from "../data/report";
+import { ExportState, ReportUnit, entriesInPeriod, entriesOfProject, exportStateOf, formatHoursMinutes, hoursPerBucket, hoursPerProject, labelOf, periodOf, totalHours } from "../data/report";
 import { TimeTableEntry } from "../data/entry";
 import { useDataStore } from "../data/useDataStore";
+import HoursBarChart from "../components/HoursBarChart";
+import HoursPieChart from "../components/HoursPieChart";
 
 /** What the export button says — clicking it marks everything that isn't exported yet. */
 const EXPORT_LABEL: Record<ExportState, string> = { none: "Mark", some: "Partly", all: "Exported" };
@@ -53,7 +55,7 @@ export default function ReportScreen() {
             </Stack>
             {rows.length === 0
                 ? <Center p={fr(8)}><Text cl={["base", 500]}>Nothing tracked in this period.</Text></Center>
-                : <Card w="100%" maw={fr(160)} p={fr(4)}>
+                : <Card w="100%" maw={fr(160)} p={fr(4)} direction="column">
                     <Table w="100%">
                         <Table.Head>
                             <Table.Row>
@@ -85,6 +87,15 @@ export default function ReportScreen() {
                             </Table.Row>
                         </Table.Foot>
                     </Table>
+                    <Divider my={fr(4)} />
+                    <Tabs defaultValue="pie" variant="underlined" direction="column" gap={fr(4)}>
+                        <Tabs.List>
+                            <Tabs.Tab value="pie" gap={fr(2)}><ChartPieIcon size={20} />Per project</Tabs.Tab>
+                            <Tabs.Tab value="bars" gap={fr(2)}><ChartBarIcon size={20} />Per {unit === "week" ? "day" : "week"}</Tabs.Tab>
+                        </Tabs.List>
+                        <Tabs.Panel value="pie"><HoursPieChart rows={rows} /></Tabs.Panel>
+                        <Tabs.Panel value="bars"><HoursBarChart buckets={hoursPerBucket(entries, period, unit)} /></Tabs.Panel>
+                    </Tabs>
                 </Card>
             }
         </Stack>

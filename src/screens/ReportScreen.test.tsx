@@ -20,7 +20,8 @@ const entry = (day: string, hours: number, project?: string) => {
     return createEntry(start, start.plus({ hours: hours }), project);
 };
 
-const row = (label: string) => screen.getByText(label).closest("tr")!;
+// the project names show up in the chart legend too, so look them up in the table
+const row = (label: string) => within(screen.getByRole("table")).getByText(label).closest("tr")!;
 
 describe("ReportScreen", () => {
     it("says so when nothing was tracked", () => {

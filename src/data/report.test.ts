@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { DateTime } from "luxon";
 import { TimeTableEntry, createEntry } from "./entry";
-import { entriesOfProject, exportStateOf, formatHoursMinutes, hoursPerProject, labelOf, periodOf, totalHours } from "./report";
+import { entriesOfProject, exportStateOf, formatHoursMinutes, hoursPerBucket, hoursPerProject, labelOf, periodOf, totalHours } from "./report";
 
 const entry = (day: number, hours: number, project?: string) =>
     createEntry(
@@ -96,5 +96,31 @@ describe("labelOf", () => {
 
     it("names the week with its range", () => {
         expect(labelOf(periodOf(SEPTEMBER_1, "week"), "week")).toBe("Week 36 · 31.08. – 06.09.2026");
+    });
+});
+
+describe("hoursPerBucket", () => {
+    const entries = [entry(1, 2, "aWall"), entry(1, 1), entry(3, 4, "TSapp"), entry(20, 8, "aWall")];
+
+    it("splits a week into its seven days", () => {
+        expect(hoursPerBucket(entries, periodOf(SEPTEMBER_1, "week"), "week")).toEqual([
+            { label: "Mon", hours: 0 }, // 31.08.
+            { label: "Tue", hours: 3 }, // 01.09.
+            { label: "Wed", hours: 0 },
+            { label: "Thu", hours: 4 }, // 03.09.
+            { label: "Fri", hours: 0 },
+            { label: "Sat", hours: 0 },
+            { label: "Sun", hours: 0 },
+        ]);
+    });
+
+    it("splits a month into its calendar weeks", () => {
+        expect(hoursPerBucket(entries, periodOf(SEPTEMBER_1, "month"), "month")).toEqual([
+            { label: "W36", hours: 7 },
+            { label: "W37", hours: 0 },
+            { label: "W38", hours: 8 }, // 20.09.
+            { label: "W39", hours: 0 },
+            { label: "W40", hours: 0 },
+        ]);
     });
 });
