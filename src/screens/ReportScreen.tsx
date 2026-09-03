@@ -1,17 +1,41 @@
-import { ActionButton, Card, Center, SegmentedField, Stack, Table, Text, fr } from "@prismane/core";
-import { CaretLeftIcon, CaretRightIcon } from "@phosphor-icons/react";
+import { ActionButton, Button, Card, Center, SegmentedField, Stack, Table, Text, fr } from "@prismane/core";
+import { CaretLeftIcon, CaretRightIcon, CheckIcon, MinusIcon } from "@phosphor-icons/react";
 import { DateTime } from "luxon";
 import { ChangeEvent, useState } from "react";
-import { ReportUnit, formatHoursMinutes, hoursPerProject, labelOf, periodOf, totalHours } from "../data/report";
+import { ExportState, ReportUnit, entriesInPeriod, entriesOfProject, exportStateOf, formatHoursMinutes, hoursPerProject, labelOf, periodOf, totalHours } from "../data/report";
+import { TimeTableEntry } from "../data/entry";
 import { useDataStore } from "../data/useDataStore";
+
+/** What the export button says — clicking it marks everything that isn't exported yet. */
+const EXPORT_LABEL: Record<ExportState, string> = { none: "Mark", some: "Partly", all: "Exported" };
+
+interface ExportButtonProps {
+    state: ExportState;
+    label?: string;
+    onClick: () => void;
+}
+
+function ExportButton({ state, label, onClick }: ExportButtonProps) {
+    return (
+        <Button size="sm" variant={state === "all" ? "primary" : "tertiary"} onClick={onClick}
+            icon={state === "all" ? <CheckIcon /> : state === "some" ? <MinusIcon /> : undefined}>
+            {label ?? EXPORT_LABEL[state]}
+        </Button>
+    );
+}
 
 export default function ReportScreen() {
     const entries = useDataStore(s => s.entries);
+    const setExported = useDataStore(s => s.setExported);
     const [unit, setUnit] = useState<ReportUnit>("week");
     const [date, setDate] = useState(DateTime.now());
 
     const period = periodOf(date, unit);
     const rows = hoursPerProject(entries, period);
+    const total = exportStateOf(entriesInPeriod(entries, period));
+
+    /** Export what is left, or take the mark back once everything carries it. */
+    const toggle = (of: TimeTableEntry[], state: ExportState) => setExported(of, state !== "all");
 
     return (
         <Stack w="100%" p={fr(4)} gap={fr(4)} align="center" bs="border-box">
@@ -35,6 +59,7 @@ export default function ReportScreen() {
                             <Table.Row>
                                 <Table.Cell as="th" ta="left">Project</Table.Cell>
                                 <Table.Cell as="th" ta="right">Hours</Table.Cell>
+                                <Table.Cell as="th" ta="right">Exported</Table.Cell>
                             </Table.Row>
                         </Table.Head>
                         <Table.Body>
@@ -42,6 +67,10 @@ export default function ReportScreen() {
                                 <Table.Row key={r.project ?? ""}>
                                     <Table.Cell>{r.project ?? "(no project)"}</Table.Cell>
                                     <Table.Cell ta="right">{formatHoursMinutes(r.hours)}</Table.Cell>
+                                    <Table.Cell ta="right">
+                                        <ExportButton state={r.exported}
+                                            onClick={() => toggle(entriesOfProject(entries, period, r.project), r.exported)} />
+                                    </Table.Cell>
                                 </Table.Row>
                             ))}
                         </Table.Body>
@@ -49,6 +78,10 @@ export default function ReportScreen() {
                             <Table.Row>
                                 <Table.Cell fw="bold">Total</Table.Cell>
                                 <Table.Cell fw="bold" ta="right">{formatHoursMinutes(totalHours(rows))}</Table.Cell>
+                                <Table.Cell ta="right">
+                                    <ExportButton state={total} label={total === "all" ? undefined : "Mark all"}
+                                        onClick={() => toggle(entriesInPeriod(entries, period), total)} />
+                                </Table.Cell>
                             </Table.Row>
                         </Table.Foot>
                     </Table>

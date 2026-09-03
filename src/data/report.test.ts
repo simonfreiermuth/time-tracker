@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { DateTime } from "luxon";
-import { createEntry } from "./entry";
-import { formatHoursMinutes, hoursPerProject, labelOf, periodOf, totalHours } from "./report";
+import { TimeTableEntry, createEntry } from "./entry";
+import { entriesOfProject, exportStateOf, formatHoursMinutes, hoursPerProject, labelOf, periodOf, totalHours } from "./report";
 
 const entry = (day: number, hours: number, project?: string) =>
     createEntry(
@@ -23,22 +23,54 @@ describe("hoursPerProject", () => {
 
     it("sums the entries of the period per project, longest first", () => {
         expect(hoursPerProject(entries, periodOf(SEPTEMBER_1, "week"))).toEqual([
-            { project: "TSapp", hours: 4 },
-            { project: "aWall", hours: 3.5 },
-            { project: undefined, hours: 1 },
+            { project: "TSapp", hours: 4, exported: "none" },
+            { project: "aWall", hours: 3.5, exported: "none" },
+            { project: undefined, hours: 1, exported: "none" },
         ]);
     });
 
     it("covers the whole month when asked for one", () => {
         expect(hoursPerProject(entries, periodOf(SEPTEMBER_1, "month"))).toEqual([
-            { project: "aWall", hours: 11.5 },
-            { project: "TSapp", hours: 4 },
-            { project: undefined, hours: 1 },
+            { project: "aWall", hours: 11.5, exported: "none" },
+            { project: "TSapp", hours: 4, exported: "none" },
+            { project: undefined, hours: 1, exported: "none" },
         ]);
     });
 
     it("is empty when nothing falls into the period", () => {
         expect(hoursPerProject(entries, periodOf(SEPTEMBER_1.minus({ years: 1 }), "week"))).toEqual([]);
+    });
+});
+
+describe("export state", () => {
+    const exported = (e: TimeTableEntry) => ({ ...e, exported: true });
+
+    it("tells apart nothing, some and all exported entries", () => {
+        const es = [entry(1, 2, "aWall"), entry(2, 1, "aWall")];
+        expect(exportStateOf(es)).toBe("none");
+        expect(exportStateOf([exported(es[0]), es[1]])).toBe("some");
+        expect(exportStateOf(es.map(exported))).toBe("all");
+    });
+
+    it("comes with every report row", () => {
+        const entries = [exported(entry(1, 2, "aWall")), entry(2, 1.5, "aWall"), entry(3, 4, "TSapp")];
+        expect(hoursPerProject(entries, periodOf(SEPTEMBER_1, "week"))).toEqual([
+            { project: "TSapp", hours: 4, exported: "none" },
+            { project: "aWall", hours: 3.5, exported: "some" },
+        ]);
+    });
+});
+
+describe("entriesOfProject", () => {
+    const entries = [entry(1, 2, "aWall"), entry(2, 1, "aWall"), entry(3, 4), entry(20, 8, "aWall")];
+
+    it("picks the period's entries of one project", () => {
+        expect(entriesOfProject(entries, periodOf(SEPTEMBER_1, "week"), "aWall"))
+            .toEqual([entries[0], entries[1]]);
+    });
+
+    it("picks the unassigned ones without a project", () => {
+        expect(entriesOfProject(entries, periodOf(SEPTEMBER_1, "week"))).toEqual([entries[2]]);
     });
 });
 

@@ -12,6 +12,7 @@ export interface DataStoreState {
     addEntry: (entry: TimeTableEntry) => void;
     updateEntry: (entry: TimeTableEntry) => void;
     deleteEntry: (entry: TimeTableEntry) => void;
+    setExported: (entries: TimeTableEntry[], exported: boolean) => void;
 
     addProject: (project: Project) => void;
     updateProject: (project: Project) => void;
@@ -29,6 +30,10 @@ export const createDataStore = (fileHandle?: FileSystemFileHandle) => {
             addEntry: (entry) => set({ entries: [...get().entries, entry] }),
             updateEntry: (entry) => set({ entries: [...get().entries.filter(e => e.id !== entry.id), entry] }),
             deleteEntry: (entry) => set({ entries: [...get().entries.filter(e => e.id !== entry.id)] }),
+            setExported: (entries, exported) => {
+                const ids = new Set(entries.map(e => e.id));
+                set({ entries: get().entries.map(e => ids.has(e.id) ? { ...e, exported: exported } : e) });
+            },
 
             addProject: (project) => set({ projects: [...get().projects, project] }),
             updateProject: (project) => set({ projects: get().projects.map(p => p.id === project.id ? project : p) }),

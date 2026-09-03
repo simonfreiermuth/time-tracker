@@ -5,6 +5,8 @@ export interface TimeTableEntry {
     start: DateTime;
     end: DateTime;
     project?: string;
+    /** Set once the hours have been handed on (invoiced, reported, …). */
+    exported?: boolean;
 }
 
 /**

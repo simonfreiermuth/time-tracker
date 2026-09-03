@@ -1,5 +1,5 @@
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
-import { fireEvent, screen } from "@testing-library/react";
+import { fireEvent, screen, within } from "@testing-library/react";
 import { DateTime } from "luxon";
 import { renderUI } from "../test/render";
 import ReportScreen from "./ReportScreen";
@@ -48,6 +48,42 @@ describe("ReportScreen", () => {
 
         expect(screen.getByText("Week 37 · 07.09. – 13.09.2026")).toBeInTheDocument();
         expect(row("aWall")).toHaveTextContent("03:00");
+    });
+
+    it("marks a project's hours of the period as exported and back", () => {
+        const f = renderUI(<ReportScreen />, {
+            entries: [entry("16", 2, "aWall"), entry("17", 1.5, "aWall"), entry("02", 8, "aWall")],
+        });
+
+        fireEvent.click(within(row("aWall")).getByRole("button", { name: "Mark" }));
+
+        const exported = f.store.getState().entries.filter(e => e.exported);
+        expect(exported).toHaveLength(2); // the two of this week, not the one from 02.09.
+        expect(within(row("aWall")).getByRole("button", { name: "Exported" })).toBeInTheDocument();
+
+        fireEvent.click(within(row("aWall")).getByRole("button", { name: "Exported" }));
+        expect(f.store.getState().entries.filter(e => e.exported)).toHaveLength(0);
+    });
+
+    it("shows a partly exported project and marks the rest", () => {
+        const f = renderUI(<ReportScreen />, {
+            entries: [{ ...entry("16", 2, "aWall"), exported: true }, entry("17", 1.5, "aWall")],
+        });
+
+        const partly = within(row("aWall")).getByRole("button", { name: "Partly" });
+        fireEvent.click(partly);
+
+        expect(f.store.getState().entries.every(e => e.exported)).toBe(true);
+    });
+
+    it("marks the whole period at once", () => {
+        const f = renderUI(<ReportScreen />, {
+            entries: [entry("16", 2, "aWall"), entry("17", 1), entry("02", 8, "TSapp")],
+        });
+
+        fireEvent.click(screen.getByRole("button", { name: "Mark all" }));
+
+        expect(f.store.getState().entries.filter(e => e.exported)).toHaveLength(2);
     });
 
     it("switches to a monthly report", () => {
